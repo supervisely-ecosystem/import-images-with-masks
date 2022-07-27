@@ -1,0 +1,31 @@
+{
+  "name": "Import images with masks",
+  "type": "app",
+  "categories": [
+    "import",
+    "images",
+    "essentials"
+  ],
+  "description": "Import images with binary masks as annotations",
+  "docker_image": "supervisely/base-py-sdk:6.43.0",
+  "main_script": "src/main.py",
+  "modal_template": "src/modal.html",
+  "modal_template_state": {
+    "files": "",
+    "remove_source": true,
+    "project_name": ""
+  },
+  "task_location": "workspace_tasks",
+  "icon": "",
+  "icon_cover": true,
+  "icon_background": "#FFFFFF",
+  "instance_version": "6.5.1",
+  "headless": true,
+  "context_menu": {
+    "context_category": "Import",
+    "target": [
+      "files_folder"
+    ]
+  },
+  "poster": ""
+}
