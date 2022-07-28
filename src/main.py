@@ -13,13 +13,12 @@ def import_images_with_masks(api: sly.Api, task_id: int):
         raise FileNotFoundError(f"There are no files in selected directory: '{g.INPUT_PATH}'")
 
     project_name = (f.get_project_name_from_input_path(g.INPUT_PATH) if len(g.OUTPUT_PROJECT_NAME) == 0 else g.OUTPUT_PROJECT_NAME)
-    project = api.project.create(workspace_id=g.WORKSPACE_ID, name=project_name, change_name_if_conflict=True)
     original_project_path, converted_project_path = f.download_project(api, g.INPUT_PATH)
     f.convert(original_project_path, converted_project_path)
 
-    sly.upload_project(dir=converted_project_path, api=api, workspace_id=g.WORKSPACE_ID, project_name=project_name)
+    project_id, project_name = sly.upload_project(dir=converted_project_path, api=api, workspace_id=g.WORKSPACE_ID, project_name=project_name)
     api.task.set_output_project(
-        task_id=task_id, project_id=project.id, project_name=project.name
+        task_id=task_id, project_id=project_id, project_name=project_name
     )
 
 
