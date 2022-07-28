@@ -13,9 +13,9 @@ print(f"App root directory: {app_root_directory}")
 sly.logger.info(f'PYTHONPATH={os.environ.get("PYTHONPATH", "")}')
 
 # order matters
-# from dotenv import load_dotenv
-# load_dotenv(os.path.join(app_root_directory, "secret_debug.env"))
-# load_dotenv(os.path.join(app_root_directory, "debug.env"))
+from dotenv import load_dotenv
+load_dotenv(os.path.join(app_root_directory, "secret_debug.env"))
+load_dotenv(os.path.join(app_root_directory, "debug.env"))
 
 app = FastAPI()
 
@@ -33,6 +33,9 @@ if INPUT_PATH is None or INPUT_PATH == "":
 
 IMAGE_DIR_NAME = 'img'
 ANNOTATION_DIR_NAME = 'ann'
+MASKS_MACHINE_DIR_NAME = 'masks_machine'
+MASKS_INSTANCE_DIR_NAME = 'masks_instances'
+
 DEFAULT_DATASET_NAME = "ds0"
 OUTPUT_PROJECT_NAME = os.environ.get("modal.state.project_name", "")
 REMOVE_SOURCE = bool(strtobool(os.getenv("modal.state.remove_source")))
