@@ -97,10 +97,20 @@ def get_dataset_masks(dataset_path: str, images_names: list) -> dict:
     mask_dirs = get_mask_dirs(dataset_path)
     masks_map = {"semantic": [], "instance": []}
     mime = magic.Magic(mime=True)
+    is_warned_missing = False
+    if len(mask_dirs) == 0:
+        sly.logger.warn(f"There are no mask directories for dataset: {basename(dataset_path)}. It will be uploaded without masks.")
     for mask_dir in mask_dirs:
         if len(os.listdir(mask_dir)) == 0:
             continue
         mask_dir_items = list(os.listdir(mask_dir))
+
+        if len(mask_dir_items) != len(images_names) and not is_warned_missing:
+            mask_dir_items_names = [get_file_name(item_name) for item_name in mask_dir_items]
+            missing_masks = ", ".join(map(str, list(set(images_names) - set(mask_dir_items_names))))
+            sly.logger.warn(f"Masks for images: {missing_masks} are missing.")
+            is_warned_missing = True
+
         for item_name in mask_dir_items:
             if get_file_name(item_name) not in images_names:
                 continue
@@ -124,24 +134,37 @@ def get_dataset_masks(dataset_path: str, images_names: list) -> dict:
     return masks_map
 
 
-def get_mask_path(masks_map: dict, image_name: str) -> tuple:
+def get_mask_path(masks_map: dict, images_names, current_image_name: str) -> tuple:
     semantic_masks = masks_map["semantic"]
     for item in semantic_masks:
-        for k, v in item.items():
-            if k == image_name:
-                semantic_masks = v
+        if semantic_masks != masks_map["semantic"]:
+            break
+        for _ in images_names:
+            if semantic_masks != masks_map["semantic"]:
                 break
-    if len(semantic_masks) == 0:
+            for k, v in item.items():
+                if k == current_image_name:
+                    semantic_masks = v
+                    break
+    if len(semantic_masks) == 0 or semantic_masks == masks_map["semantic"]:
         semantic_masks = None
+
 
     instance_masks = masks_map["instance"]
     for item in instance_masks:
-        for k, v in item.items():
-            if k == image_name:
-                instance_masks = v
+        if instance_masks != masks_map["instance"]:
+            break
+        for _ in images_names:
+            if instance_masks != masks_map["instance"]:
                 break
-    if len(instance_masks) == 0:
+            for k, v in item.items():
+                if k == current_image_name:
+                    instance_masks = v
+                    break
+
+    if len(instance_masks) == 0 or instance_masks == masks_map["instance"]:
         instance_masks = None
+
     return semantic_masks, instance_masks
 
 
@@ -203,7 +226,7 @@ def convert_project(
         masks_map = get_dataset_masks(dataset_path, images_names)
 
         progress = sly.Progress(
-            "Dataset: {!r}".format(g.DEFAULT_DATASET_NAME), len(images_paths)
+            "Dataset: {!r}".format(dataset_name), len(images_paths)
         )
         for image_name, images_name_with_ext, image_path in zip(
                 images_names, images_names_with_ext, images_paths
@@ -212,7 +235,8 @@ def convert_project(
                 ann = sly.Annotation.from_img_path(img_path=image_path)
                 semantic_mask_path, instance_masks_paths = get_mask_path(
                     masks_map=masks_map,
-                    image_name=image_name
+                    images_names=images_names,
+                    current_image_name=image_name
                 )
                 semantic_labels = []
                 if semantic_mask_path is not None:

@@ -13,9 +13,9 @@ print(f"App root directory: {app_root_directory}")
 sly.logger.info(f'PYTHONPATH={os.environ.get("PYTHONPATH", "")}')
 
 # order matters
-from dotenv import load_dotenv
-load_dotenv(os.path.join(app_root_directory, "secret_debug.env"))
-load_dotenv(os.path.join(app_root_directory, "debug.env"))
+# from dotenv import load_dotenv
+# load_dotenv(os.path.join(app_root_directory, "secret_debug.env"))
+# load_dotenv(os.path.join(app_root_directory, "debug.env"))
 
 app = FastAPI()
 
@@ -39,7 +39,6 @@ MASKS_HUMAN_DIR_NAME = "masks_human"
 
 COLOR_MAP_FILE_NAME = "obj_class_to_machine_color.json"
 
-DEFAULT_DATASET_NAME = "ds0"
 OUTPUT_PROJECT_NAME = os.environ.get("modal.state.project_name", "")
 REMOVE_SOURCE = bool(strtobool(os.getenv("modal.state.remove_source")))
 MATCH_ALL = "__all__"
