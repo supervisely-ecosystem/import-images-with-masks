@@ -42,14 +42,14 @@ def get_datasets(project_path: str) -> tuple:
 
 
 def get_class_color_map(project_path: str) -> dict:
-    class_color_map_path = join(project_path, "classes_mapping.json")
+    class_color_map_path = join(project_path, g.COLOR_MAP_FILE_NAME)
     if not exists(class_color_map_path):
-        raise FileNotFoundError("Classes mapping not found.")
+        raise FileNotFoundError(f"Classes mapping file: {g.COLOR_MAP_FILE_NAME} not found.")
     return load_json_file(class_color_map_path)
 
 
 def get_or_create_project_meta(
-    project_path: str, classes_mapping: dict
+        project_path: str, classes_mapping: dict
 ) -> sly.ProjectMeta:
     project_meta_path = join(project_path, "meta.json")
     if exists(project_meta_path):
@@ -69,10 +69,10 @@ def get_custom_masks_dir_name(dataset_path: str) -> list:
         dir_name
         for dir_name in os.listdir(dataset_path)
         if isdir(join(dataset_path, dir_name))
-        and dir_name.startswith("mask")
-        and dir_name != g.MASKS_MACHINE_DIR_NAME
-        and dir_name != g.MASKS_INSTANCE_DIR_NAME
-        and dir_name != g.MASKS_HUMAN_DIR_NAME
+           and dir_name.startswith("mask")
+           and dir_name != g.MASKS_MACHINE_DIR_NAME
+           and dir_name != g.MASKS_INSTANCE_DIR_NAME
+           and dir_name != g.MASKS_HUMAN_DIR_NAME
     ]
     return [join(dataset_path, dir_name) for dir_name in dirs]
 
@@ -131,7 +131,7 @@ def get_mask_path(masks_map: dict, image_name: str) -> tuple:
 
 
 def read_semantic_labels(
-    mask_path: str, classes_mapping: dict, obj_classes: sly.ObjClassCollection
+        mask_path: str, classes_mapping: dict, obj_classes: sly.ObjClassCollection
 ) -> list:
     mask = cv2.imread(mask_path)[:, :, 0]
     labels_list = []
@@ -156,9 +156,9 @@ def read_semantic_labels(
     return labels_list
 
 
-def read_instance_labels(instance_masks_paths: list, obj_classes: list) -> list:
+def read_instance_labels(mask_paths: list, obj_classes: list) -> list:
     labels = []
-    for instance_mask_path in instance_masks_paths:
+    for instance_mask_path in mask_paths:
         obj_class_name = re.sub(r"_\d+", "", get_file_name(instance_mask_path))
         obj_class = obj_classes.get(obj_class_name)
         bitmap = sly.Bitmap.from_path(instance_mask_path)
@@ -168,10 +168,10 @@ def read_instance_labels(instance_masks_paths: list, obj_classes: list) -> list:
 
 
 def convert_project(
-    project_path: str,
-    new_project_path: str,
-    project_meta: sly.ProjectMeta,
-    classes_map: dict,
+        project_path: str,
+        new_project_path: str,
+        project_meta: sly.ProjectMeta,
+        classes_map: dict,
 ):
     project = sly.Project(directory=new_project_path, mode=sly.OpenMode.CREATE)
     project.set_meta(project_meta)
@@ -191,21 +191,24 @@ def convert_project(
             "Dataset: {!r}".format(g.DEFAULT_DATASET_NAME), len(images_paths)
         )
         for image_name, images_name_with_ext, image_path in zip(
-            images_names, images_names_with_ext, images_paths
+                images_names, images_names_with_ext, images_paths
         ):
             try:
-                ann = sly.Annotation.from_img_path(image_path)
+                ann = sly.Annotation.from_img_path(img_path=image_path)
                 semantic_mask_path, instance_masks_paths = get_mask_path(
-                    masks_map, image_name
+                    masks_map=masks_map,
+                    image_name=image_name
                 )
                 semantic_labels = read_semantic_labels(
-                    semantic_mask_path, classes_map, project_meta.obj_classes
+                    mask_path=semantic_mask_path,
+                    classes_mapping=classes_map,
+                    obj_classes=project_meta.obj_classes
                 )
                 instance_labels = read_instance_labels(
-                    instance_masks_paths, project_meta.obj_classes
+                    mask_paths=instance_masks_paths,
+                    obj_classes=project_meta.obj_classes
                 )
-                labels = semantic_labels + instance_labels
-                ann = ann.add_labels(labels)
+                ann = ann.add_labels(labels=semantic_labels + instance_labels)
                 dataset.add_item_file(
                     item_name=images_name_with_ext, item_path=image_path, ann=ann
                 )

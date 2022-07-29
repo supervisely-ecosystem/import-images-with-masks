@@ -15,12 +15,12 @@ def import_images_with_masks(api: sly.Api, task_id: int):
         )
 
     project_name = (
-        f.get_project_name_from_input_path(g.INPUT_PATH)
+        f.get_project_name_from_input_path(input_path=g.INPUT_PATH)
         if len(g.OUTPUT_PROJECT_NAME) == 0
         else g.OUTPUT_PROJECT_NAME
     )
     original_project_path, converted_project_path = f.download_project(
-        api, g.INPUT_PATH
+        api=api, input_path=g.INPUT_PATH
     )
     class_color_map = f.get_class_color_map(project_path=original_project_path)
     project_meta = f.get_or_create_project_meta(

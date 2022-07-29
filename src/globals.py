@@ -37,12 +37,11 @@ MASKS_MACHINE_DIR_NAME = "masks_machine"
 MASKS_INSTANCE_DIR_NAME = "masks_instances"
 MASKS_HUMAN_DIR_NAME = "masks_human"
 
+COLOR_MAP_FILE_NAME = "obj_class_to_machine_color.json"
+
 DEFAULT_DATASET_NAME = "ds0"
 OUTPUT_PROJECT_NAME = os.environ.get("modal.state.project_name", "")
 REMOVE_SOURCE = bool(strtobool(os.getenv("modal.state.remove_source")))
-
-CLASSES_MAPPING_KEY = "classes_mapping"
 MATCH_ALL = "__all__"
-DEFAULT_CLASSES_MAPPING = {"untitled": MATCH_ALL}
 
 STORAGE_DIR = sly.app.get_data_dir()
