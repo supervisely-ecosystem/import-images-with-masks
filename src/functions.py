@@ -78,11 +78,19 @@ def get_custom_masks_dir_name(dataset_path: str) -> list:
 
 
 def get_mask_dirs(dataset_path: str) -> list:
+    mask_dirs = []
     ann_dir = join(dataset_path, g.ANNOTATION_DIR_NAME)
+    if exists(ann_dir):
+        mask_dirs.append(ann_dir)
     masks_machine = join(dataset_path, g.MASKS_MACHINE_DIR_NAME)
+    if exists(masks_machine):
+        mask_dirs.append(masks_machine)
     masks_instances = join(dataset_path, g.MASKS_INSTANCE_DIR_NAME)
+    if exists(masks_instances):
+        mask_dirs.append(masks_instances)
     masks_custom_dir_names = get_custom_masks_dir_name(dataset_path)
-    return [ann_dir, masks_machine, masks_instances] + masks_custom_dir_names
+
+    return mask_dirs + masks_custom_dir_names
 
 
 def get_dataset_masks(dataset_path: str, images_names: list) -> dict:
@@ -90,28 +98,29 @@ def get_dataset_masks(dataset_path: str, images_names: list) -> dict:
     masks_map = {"semantic": [], "instance": []}
     mime = magic.Magic(mime=True)
     for mask_dir in mask_dirs:
-        if not exists(mask_dir):
-            continue
         if len(os.listdir(mask_dir)) == 0:
             continue
         mask_dir_items = list(os.listdir(mask_dir))
         for item_name in mask_dir_items:
-            item_path = join(mask_dir, item_name)
-            if not isdir(item_path):
-                mimetype = mime.from_file(item_path)
-
-            # def validate_item(item_path):
             if get_file_name(item_name) not in images_names:
                 continue
-
-            if not mimetype.startswith("image"):
-                sly.logger.warn(f"{item_path} is not an image (mimetype: {mimetype})")
-                continue
-            if isdir(item_path):
-                instance_masks = sly.fs.list_files(item_path)
-                masks_map["instance"].append({basename(item_path): instance_masks})
+            item_path = join(mask_dir, item_name)
             if isfile(item_path):
+                mimetype = mime.from_file(item_path)
+                if not mimetype.startswith("image"):
+                    sly.logger.warn(f"{item_path} is not an image (mimetype: {mimetype})")
                 masks_map["semantic"].append({get_file_name(item_name): item_path})
+            else:
+                instance_masks = sly.fs.list_files(item_path)
+                validated_masks = []
+                for mask_path in instance_masks:
+                    mimetype = mime.from_file(mask_path)
+                    if mimetype.startswith("image"):
+                        validated_masks.append(mask_path)
+                    else:
+                        sly.logger.warn(f"{mask_path} is not an image (mimetype: {mimetype})")
+                    masks_map["instance"].append({basename(item_path): validated_masks})
+
     return masks_map
 
 
@@ -122,6 +131,8 @@ def get_mask_path(masks_map: dict, image_name: str) -> tuple:
             if k == image_name:
                 semantic_masks = v
                 break
+    if len(semantic_masks) == 0:
+        semantic_masks = None
 
     instance_masks = masks_map["instance"]
     for item in instance_masks:
@@ -129,6 +140,8 @@ def get_mask_path(masks_map: dict, image_name: str) -> tuple:
             if k == image_name:
                 instance_masks = v
                 break
+    if len(instance_masks) == 0:
+        instance_masks = None
     return semantic_masks, instance_masks
 
 
@@ -201,15 +214,19 @@ def convert_project(
                     masks_map=masks_map,
                     image_name=image_name
                 )
-                semantic_labels = read_semantic_labels(
-                    mask_path=semantic_mask_path,
-                    classes_mapping=classes_map,
-                    obj_classes=project_meta.obj_classes
-                )
-                instance_labels = read_instance_labels(
-                    mask_paths=instance_masks_paths,
-                    obj_classes=project_meta.obj_classes
-                )
+                semantic_labels = []
+                if semantic_mask_path is not None:
+                    semantic_labels = read_semantic_labels(
+                        mask_path=semantic_mask_path,
+                        classes_mapping=classes_map,
+                        obj_classes=project_meta.obj_classes
+                    )
+                instance_labels = []
+                if instance_masks_paths is not None:
+                    instance_labels = read_instance_labels(
+                        mask_paths=instance_masks_paths,
+                        obj_classes=project_meta.obj_classes
+                    )
                 ann = ann.add_labels(labels=semantic_labels + instance_labels)
                 dataset.add_item_file(
                     item_name=images_name_with_ext, item_path=image_path, ann=ann
@@ -223,7 +240,3 @@ def convert_project(
                 )
 
             progress.iter_done_report()
-
-        if masks_map:
-            masks_list = list(masks_map.values())
-            sly.logger.warning(f"Images for masks doesn't exist. Masks: {masks_list}")
