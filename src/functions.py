@@ -90,6 +90,8 @@ def get_dataset_masks(dataset_path: str, images_names: list) -> dict:
     masks_map = {"semantic": [], "instance": []}
     mime = magic.Magic(mime=True)
     for mask_dir in mask_dirs:
+        if not exists(mask_dir):
+            continue
         if len(os.listdir(mask_dir)) == 0:
             continue
         mask_dir_items = list(os.listdir(mask_dir))
