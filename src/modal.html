@@ -1,9 +1,5 @@
 <div>
 
-    {{ context }}
-
-    {{ state }}
-
     <div>
         <sly-file-storage-upload v-if="context.slyProjectId"
                                  :options="{ folder: '/import/import-images-with-masks/' + context.formId + '/' }"
