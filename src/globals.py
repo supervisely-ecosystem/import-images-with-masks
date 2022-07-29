@@ -31,14 +31,16 @@ INPUT_PATH = os.environ.get("modal.state.files", None)
 if INPUT_PATH is None or INPUT_PATH == "":
     INPUT_PATH = os.environ.get("modal.state.slyFolder")
 
-IMAGE_DIR_NAME = 'img'
-ANNOTATION_DIR_NAME = 'ann'
-DEFAULT_DATASET_NAME = "ds0"
+IMAGE_DIR_NAME = "img"
+ANNOTATION_DIR_NAME = "ann"
+MASKS_MACHINE_DIR_NAME = "masks_machine"
+MASKS_INSTANCE_DIR_NAME = "masks_instances"
+MASKS_HUMAN_DIR_NAME = "masks_human"
+
+COLOR_MAP_FILE_NAME = "obj_class_to_machine_color.json"
+
 OUTPUT_PROJECT_NAME = os.environ.get("modal.state.project_name", "")
 REMOVE_SOURCE = bool(strtobool(os.getenv("modal.state.remove_source")))
-
-CLASSES_MAPPING_KEY = 'classes_mapping'
-MATCH_ALL = '__all__'
-DEFAULT_CLASSES_MAPPING = {'untitled': MATCH_ALL}
+MATCH_ALL = "__all__"
 
 STORAGE_DIR = sly.app.get_data_dir()
