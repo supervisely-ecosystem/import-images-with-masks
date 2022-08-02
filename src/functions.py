@@ -47,11 +47,15 @@ def get_datasets(project_path: str) -> tuple:
 def get_class_color_map(project_path: str) -> dict:
     class_color_map_path = join(project_path, g.COLOR_MAP_FILE_NAME)
     if not exists(class_color_map_path):
-        raise FileNotFoundError(f"Classes mapping file: {g.COLOR_MAP_FILE_NAME} not found.")
+        raise FileNotFoundError(
+            f"Classes mapping file: {g.COLOR_MAP_FILE_NAME} not found."
+        )
     return load_json_file(class_color_map_path)
 
 
-def merge_meta_and_classes_mapping(api, project_meta, classes_mapping):
+def merge_meta_and_classes_mapping(
+    api: sly.Api, project_meta: sly.ProjectMeta, classes_mapping: dict
+) -> sly.ProjectMeta:
     for cls_name in classes_mapping:
         obj_class = project_meta.get_obj_class(cls_name)
         if obj_class is None:
@@ -62,12 +66,14 @@ def merge_meta_and_classes_mapping(api, project_meta, classes_mapping):
 
 
 def get_or_create_project_meta(
-        api, project_path: str, classes_mapping: dict
+    api, project_path: str, classes_mapping: dict
 ) -> sly.ProjectMeta:
     if g.PROJECT_ID is not None:
         project_meta_json = g.api.project.get_meta(id=g.PROJECT_ID)
         project_meta = sly.ProjectMeta.from_json(data=project_meta_json)
-        return merge_meta_and_classes_mapping(api=api, project_meta=project_meta, classes_mapping=classes_mapping)
+        return merge_meta_and_classes_mapping(
+            api=api, project_meta=project_meta, classes_mapping=classes_mapping
+        )
 
     project_meta_path = join(project_path, "meta.json")
     if exists(project_meta_path):
@@ -87,10 +93,10 @@ def get_custom_masks_dir_name(dataset_path: str) -> list:
         dir_name
         for dir_name in os.listdir(dataset_path)
         if isdir(join(dataset_path, dir_name))
-           and dir_name.startswith("mask")
-           and dir_name != g.MASKS_MACHINE_DIR_NAME
-           and dir_name != g.MASKS_INSTANCE_DIR_NAME
-           and dir_name != g.MASKS_HUMAN_DIR_NAME
+        and dir_name.startswith("mask")
+        and dir_name != g.MASKS_MACHINE_DIR_NAME
+        and dir_name != g.MASKS_INSTANCE_DIR_NAME
+        and dir_name != g.MASKS_HUMAN_DIR_NAME
     ]
     return [join(dataset_path, dir_name) for dir_name in dirs]
 
@@ -119,15 +125,20 @@ def get_dataset_masks(dataset_path: str, images_names: list) -> dict:
     dataset_name = basename(dataset_path)
     if len(mask_dirs) == 0 and dataset_name != g.DEFAULT_DS_NAME:
         sly.logger.warn(
-            f"There are no mask directories for dataset: {dataset_name}. It will be uploaded without masks.")
+            f"There are no mask directories for dataset: {dataset_name}. It will be uploaded without masks."
+        )
     for mask_dir in mask_dirs:
         if len(os.listdir(mask_dir)) == 0:
             continue
         mask_dir_items = list(os.listdir(mask_dir))
 
         if len(mask_dir_items) != len(images_names) and not is_warned_missing:
-            mask_dir_items_names = [get_file_name(item_name) for item_name in mask_dir_items]
-            missing_masks = ", ".join(map(str, list(set(images_names) - set(mask_dir_items_names))))
+            mask_dir_items_names = [
+                get_file_name(item_name) for item_name in mask_dir_items
+            ]
+            missing_masks = ", ".join(
+                map(str, list(set(images_names) - set(mask_dir_items_names)))
+            )
             sly.logger.warn(f"Masks for images: {missing_masks} are missing.")
             is_warned_missing = True
 
@@ -138,7 +149,9 @@ def get_dataset_masks(dataset_path: str, images_names: list) -> dict:
             if isfile(item_path):
                 mimetype = mime.from_file(item_path)
                 if not mimetype.startswith("image"):
-                    sly.logger.warn(f"{item_path} is not an image (mimetype: {mimetype})")
+                    sly.logger.warn(
+                        f"{item_path} is not an image (mimetype: {mimetype})"
+                    )
                 masks_map["semantic"].append({get_file_name(item_name): item_path})
             else:
                 instance_masks = sly.fs.list_files(item_path)
@@ -148,13 +161,17 @@ def get_dataset_masks(dataset_path: str, images_names: list) -> dict:
                     if mimetype.startswith("image"):
                         validated_masks.append(mask_path)
                     else:
-                        sly.logger.warn(f"{mask_path} is not an image (mimetype: {mimetype})")
+                        sly.logger.warn(
+                            f"{mask_path} is not an image (mimetype: {mimetype})"
+                        )
                     masks_map["instance"].append({basename(item_path): validated_masks})
 
     return masks_map
 
 
-def get_mask_path(masks_map: dict, images_names, current_image_name: str) -> tuple:
+def get_mask_path(
+    masks_map: dict, images_names: list, current_image_name: str
+) -> tuple:
     semantic_masks = masks_map["semantic"]
     for item in semantic_masks:
         if semantic_masks != masks_map["semantic"]:
@@ -188,7 +205,7 @@ def get_mask_path(masks_map: dict, images_names, current_image_name: str) -> tup
 
 
 def read_semantic_labels(
-        mask_path: str, classes_mapping: dict, obj_classes: sly.ObjClassCollection
+    mask_path: str, classes_mapping: dict, obj_classes: sly.ObjClassCollection
 ) -> list:
     mask = cv2.imread(mask_path)[:, :, 0]
     labels_list = []
@@ -225,11 +242,11 @@ def read_instance_labels(mask_paths: list, obj_classes: list) -> list:
 
 
 def convert_project(
-        project_path: str,
-        new_project_path: str,
-        project_meta: sly.ProjectMeta,
-        classes_map: dict,
-):
+    project_path: str,
+    new_project_path: str,
+    project_meta: sly.ProjectMeta,
+    classes_map: dict,
+) -> sly.Project:
     project = sly.Project(directory=new_project_path, mode=sly.OpenMode.CREATE)
     project.set_meta(project_meta)
     dataset_names, dataset_paths = get_datasets(project_path=project_path)
@@ -243,31 +260,29 @@ def convert_project(
         images_paths = [join(img_dir, file_name) for file_name in os.listdir(img_dir)]
         masks_map = get_dataset_masks(dataset_path, images_names)
 
-        progress = sly.Progress(
-            "Dataset: {!r}".format(dataset_name), len(images_paths)
-        )
+        progress = sly.Progress("Dataset: {!r}".format(dataset_name), len(images_paths))
         for image_name, image_name_with_ext, image_path in zip(
-                images_names, images_names_with_ext, images_paths
+            images_names, images_names_with_ext, images_paths
         ):
             try:
                 ann = sly.Annotation.from_img_path(img_path=image_path)
                 semantic_mask_path, instance_masks_paths = get_mask_path(
                     masks_map=masks_map,
                     images_names=images_names,
-                    current_image_name=image_name
+                    current_image_name=image_name,
                 )
                 semantic_labels = []
                 if semantic_mask_path is not None:
                     semantic_labels = read_semantic_labels(
                         mask_path=semantic_mask_path,
                         classes_mapping=classes_map,
-                        obj_classes=project_meta.obj_classes
+                        obj_classes=project_meta.obj_classes,
                     )
                 instance_labels = []
                 if instance_masks_paths is not None:
                     instance_labels = read_instance_labels(
                         mask_paths=instance_masks_paths,
-                        obj_classes=project_meta.obj_classes
+                        obj_classes=project_meta.obj_classes,
                     )
                 ann = ann.add_labels(labels=semantic_labels + instance_labels)
                 dataset.add_item_file(
@@ -285,7 +300,13 @@ def convert_project(
     return project
 
 
-def upload_project(api, task_id, local_project, project_name, local_project_path):
+def upload_project(
+    api: sly.Api,
+    task_id: int,
+    local_project: sly.Project,
+    project_name: str,
+    local_project_path: str,
+) -> None:
     if g.PROJECT_ID is None:
         project_id, project_name = sly.upload_project(
             dir=local_project_path,
@@ -302,26 +323,51 @@ def upload_project(api, task_id, local_project, project_name, local_project_path
         dataset_name = g.api.dataset.get_info_by_id(g.DATASET_ID).name
         for dataset in datasets:
             all_images_names = dataset.get_items_names()
-            progress = sly.Progress(message=f"Upload images to dataset: {dataset_name}",
-                                    total_cnt=len(all_images_names))
-            batch_upload(api=api, task_id=task_id, ds_images_names=all_images_names, dataset=dataset,
-                         dst_dataset_id=g.DATASET_ID,
-                         project_name=project_name, progress=progress)
+            progress = sly.Progress(
+                message=f"Upload images to dataset: {dataset_name}",
+                total_cnt=len(all_images_names),
+            )
+            batch_upload(
+                api=api,
+                task_id=task_id,
+                ds_images_names=all_images_names,
+                dataset=dataset,
+                dst_dataset_id=g.DATASET_ID,
+                project_name=project_name,
+                progress=progress,
+            )
 
     else:
         datasets = local_project.datasets
         for dataset in datasets:
-            dst_dataset = g.api.dataset.create(project_id=g.PROJECT_ID, name=dataset.name,
-                                               change_name_if_conflict=True)
+            dst_dataset = g.api.dataset.create(
+                project_id=g.PROJECT_ID, name=dataset.name, change_name_if_conflict=True
+            )
             all_images_names = dataset.get_items_names()
-            progress = sly.Progress(message=f"Upload images to dataset: {dst_dataset.name}",
-                                    total_cnt=len(all_images_names))
-            batch_upload(api=api, task_id=task_id, ds_images_names=all_images_names, dataset=dataset,
-                         dst_dataset_id=dst_dataset.id,
-                         project_name=project_name, progress=progress)
+            progress = sly.Progress(
+                message=f"Upload images to dataset: {dst_dataset.name}",
+                total_cnt=len(all_images_names),
+            )
+            batch_upload(
+                api=api,
+                task_id=task_id,
+                ds_images_names=all_images_names,
+                dataset=dataset,
+                dst_dataset_id=dst_dataset.id,
+                project_name=project_name,
+                progress=progress,
+            )
 
 
-def batch_upload(api, task_id, ds_images_names, dataset, dst_dataset_id, project_name, progress):
+def batch_upload(
+    api: sly.Api,
+    task_id: int,
+    ds_images_names: list,
+    dataset: sly.Dataset,
+    dst_dataset_id: int,
+    project_name: str,
+    progress: sly.Progress,
+) -> None:
     for batch in sly.batched(ds_images_names):
         batched_images_names = []
         batched_images_paths = []
@@ -330,8 +376,11 @@ def batch_upload(api, task_id, ds_images_names, dataset, dst_dataset_id, project
             batched_images_names.append(image_name)
             batched_images_paths.append(dataset.get_img_path(image_name))
             batched_anns_paths.append(dataset.get_ann_path(image_name))
-        images_infos = g.api.image.upload_paths(dataset_id=dst_dataset_id, names=batched_images_names,
-                                              paths=batched_images_paths)
+        images_infos = g.api.image.upload_paths(
+            dataset_id=dst_dataset_id,
+            names=batched_images_names,
+            paths=batched_images_paths,
+        )
         images_ids = [image_info.id for image_info in images_infos]
         g.api.annotation.upload_paths(img_ids=images_ids, ann_paths=batched_anns_paths)
         progress.iters_done_report(len(batch))

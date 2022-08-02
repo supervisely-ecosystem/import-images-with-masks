@@ -37,9 +37,13 @@ def import_images_with_masks(api: sly.Api, task_id: int):
         project_meta=project_meta,
         classes_map=class_color_map,
     )
-
-    f.upload_project(api=api, task_id=task_id, local_project=project, project_name=project_name, local_project_path=converted_project_path)
-
+    f.upload_project(
+        api=api,
+        task_id=task_id,
+        local_project=project,
+        project_name=project_name,
+        local_project_path=converted_project_path,
+    )
 
 
 if __name__ == "__main__":

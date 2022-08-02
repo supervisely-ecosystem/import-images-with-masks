@@ -13,9 +13,9 @@ print(f"App root directory: {app_root_directory}")
 sly.logger.info(f'PYTHONPATH={os.environ.get("PYTHONPATH", "")}')
 
 # order matters
-from dotenv import load_dotenv
-load_dotenv(os.path.join(app_root_directory, "secret_debug.env"))
-load_dotenv(os.path.join(app_root_directory, "debug.env"))
+# from dotenv import load_dotenv
+# load_dotenv(os.path.join(app_root_directory, "secret_debug.env"))
+# load_dotenv(os.path.join(app_root_directory, "debug.env"))
 
 app = FastAPI()
 
@@ -44,7 +44,13 @@ ANNOTATION_DIR_NAME = "ann"
 MASKS_MACHINE_DIR_NAME = "masks_machine"
 MASKS_INSTANCE_DIR_NAME = "masks_instances"
 MASKS_HUMAN_DIR_NAME = "masks_human"
-MASK_DIRS = [IMAGE_DIR_NAME, ANNOTATION_DIR_NAME, MASKS_HUMAN_DIR_NAME, MASKS_INSTANCE_DIR_NAME, MASKS_MACHINE_DIR_NAME]
+MASK_DIRS = [
+    IMAGE_DIR_NAME,
+    ANNOTATION_DIR_NAME,
+    MASKS_HUMAN_DIR_NAME,
+    MASKS_INSTANCE_DIR_NAME,
+    MASKS_MACHINE_DIR_NAME,
+]
 
 COLOR_MAP_FILE_NAME = "obj_class_to_machine_color.json"
 DEFAULT_DS_NAME = "ds0"
