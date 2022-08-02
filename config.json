@@ -23,7 +23,9 @@
   "context_menu": {
     "context_category": "Import",
     "target": [
-      "files_folder"
+      "files_folder",
+      "images_project",
+      "images_dataset"
     ]
   },
   "poster": ""
