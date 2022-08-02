@@ -116,9 +116,10 @@ def get_dataset_masks(dataset_path: str, images_names: list) -> dict:
     masks_map = {"semantic": [], "instance": []}
     mime = magic.Magic(mime=True)
     is_warned_missing = False
-    if len(mask_dirs) == 0:
+    dataset_name = basename(dataset_path)
+    if len(mask_dirs) == 0 and dataset_name != g.DEFAULT_DS_NAME:
         sly.logger.warn(
-            f"There are no mask directories for dataset: {basename(dataset_path)}. It will be uploaded without masks.")
+            f"There are no mask directories for dataset: {dataset_name}. It will be uploaded without masks.")
     for mask_dir in mask_dirs:
         if len(os.listdir(mask_dir)) == 0:
             continue
