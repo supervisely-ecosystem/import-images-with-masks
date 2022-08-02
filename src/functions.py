@@ -38,9 +38,9 @@ def get_datasets(project_path: str) -> tuple:
         if isdir(dataset_path):
             dataset_names.append(dataset_name)
             dataset_paths.append(dataset_path)
-    # if g.DATASET_ID is not None:
-    #     dataset_name = g.api.dataset.get_info_by_id(g.DATASET_ID).name
-    #     dataset_names = [dataset_name for _ in dataset_names]
+    if any(item in dataset_names for item in g.MASK_DIRS):
+        dataset_names = [g.DEFAULT_DS_NAME]
+        dataset_paths = [project_path]
     return dataset_names, dataset_paths
 
 

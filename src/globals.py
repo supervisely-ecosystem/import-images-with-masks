@@ -44,8 +44,10 @@ ANNOTATION_DIR_NAME = "ann"
 MASKS_MACHINE_DIR_NAME = "masks_machine"
 MASKS_INSTANCE_DIR_NAME = "masks_instances"
 MASKS_HUMAN_DIR_NAME = "masks_human"
+MASK_DIRS = [IMAGE_DIR_NAME, ANNOTATION_DIR_NAME, MASKS_HUMAN_DIR_NAME, MASKS_INSTANCE_DIR_NAME, MASKS_MACHINE_DIR_NAME]
 
 COLOR_MAP_FILE_NAME = "obj_class_to_machine_color.json"
+DEFAULT_DS_NAME = "ds0"
 
 OUTPUT_PROJECT_NAME = os.environ.get("modal.state.project_name", "")
 REMOVE_SOURCE = bool(strtobool(os.getenv("modal.state.remove_source")))
