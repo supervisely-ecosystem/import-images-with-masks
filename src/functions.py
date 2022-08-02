@@ -38,9 +38,9 @@ def get_datasets(project_path: str) -> tuple:
         if isdir(dataset_path):
             dataset_names.append(dataset_name)
             dataset_paths.append(dataset_path)
-    # if g.DATASET_ID is not None:
-    #     dataset_name = g.api.dataset.get_info_by_id(g.DATASET_ID).name
-    #     dataset_names = [dataset_name for _ in dataset_names]
+    if any(item in dataset_names for item in g.MASK_DIRS):
+        dataset_names = [g.DEFAULT_DS_NAME]
+        dataset_paths = [project_path]
     return dataset_names, dataset_paths
 
 
@@ -116,9 +116,10 @@ def get_dataset_masks(dataset_path: str, images_names: list) -> dict:
     masks_map = {"semantic": [], "instance": []}
     mime = magic.Magic(mime=True)
     is_warned_missing = False
-    if len(mask_dirs) == 0:
+    dataset_name = basename(dataset_path)
+    if len(mask_dirs) == 0 and dataset_name != g.DEFAULT_DS_NAME:
         sly.logger.warn(
-            f"There are no mask directories for dataset: {basename(dataset_path)}. It will be uploaded without masks.")
+            f"There are no mask directories for dataset: {dataset_name}. It will be uploaded without masks.")
     for mask_dir in mask_dirs:
         if len(os.listdir(mask_dir)) == 0:
             continue
