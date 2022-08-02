@@ -15,9 +15,8 @@
     "project_name": ""
   },
   "task_location": "workspace_tasks",
-  "icon": "",
+  "icon": "https://user-images.githubusercontent.com/48913536/182406824-47397e33-b596-49e7-b7c9-50a22c7e575f.png",
   "icon_cover": true,
-  "icon_background": "#FFFFFF",
   "instance_version": "6.5.1",
   "headless": true,
   "context_menu": {
