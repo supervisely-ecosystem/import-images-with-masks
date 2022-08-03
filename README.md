@@ -10,9 +10,9 @@
 </p>
 
 [![](https://img.shields.io/badge/slack-chat-green.svg?logo=slack)](https://supervise.ly/slack)
-![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/supervisely-ecosystem/export-as-masks)
-[![views](https://app.supervise.ly/img/badges/views/supervisely-ecosystem/export-as-masks)](https://supervise.ly)
-[![runs](https://app.supervise.ly/img/badges/runs/supervisely-ecosystem/export-as-masks)](https://supervise.ly)
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/supervisely-ecosystem/import-images-with-masks)
+[![views](https://app.supervise.ly/img/badges/views/supervisely-ecosystem/import-images-with-masks)](https://supervise.ly)
+[![runs](https://app.supervise.ly/img/badges/runs/supervisely-ecosystem/import-images-with-masks)](https://supervise.ly)
 
 </div>
 
@@ -27,6 +27,8 @@ Images should be in the folder `"img"` and masks should be in one (or more) of t
 * masks_machine - contains semantic segmentation masks. Masks for semantic segmentation should have the same name as the original images (but may have a different extension e.g original image name: cats_1.jpg -> mask name cats_1.png)
 * masks_instance - contains for instance segmentation masks. Masks for instance segmentation must be placed in the subdirectories that have the same name as the original images (but without extension e.g original image name: cats_1.jpg -> subdirectory name cats_1)
 * mask* - you can create a directory with a custom name that should starts with "mask".
+
+**Demo project ([download](https://github.com/supervisely-ecosystem/import-images-with-masks/releases/download/0.0.1/demo_project.zip))**
 
 **`obj_class_to_machine_color.json`** example:
 
@@ -157,7 +159,7 @@ Drag & Drop                                     From Team Files
 <img src="https://user-images.githubusercontent.com/48913536/182564948-521faa8f-4dce-4155-8b07-fed106290f54.png"/>
 </div>
 
-### Run from Images Project:
+### Import to existing Images Project:
 
 **Step 1**: Open context menu of images project -> `Run app` -> `Import`  -> `Import images with masks`
 
@@ -177,7 +179,7 @@ Drag & Drop                                     From Team Files
 <img src="https://user-images.githubusercontent.com/48913536/182565120-2ef09bd5-295c-4189-9a99-eff9009222d5.png"/>
 </div>
 
-### Run from Images Dataset:
+### Import to existing Images Dataset:
 
 **Step 1**: Open context menu of images dataset -> `Run app` -> `Import`  -> `Import images with masks`
 
