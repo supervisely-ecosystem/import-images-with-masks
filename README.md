@@ -190,6 +190,7 @@ Drag & Drop                                     From Team Files
 <div align="center" markdown>
   <img src="https://user-images.githubusercontent.com/48913536/182565154-f42bbe0b-0c01-4308-8371-164e712a304d.png" width="700px"/>
 </div>
+
 **Step 3**: Wait for the app to process your data, once done, link to your project will become available
 
 <div align="center" markdown>
