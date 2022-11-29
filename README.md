@@ -23,10 +23,10 @@ App supports both semantic and instance segmentation masks.  Backward compatible
 
 Images should be in the folder `"img"` and masks should be in one (or more) of the following folders below:
 
-* ann - contains binary masks, you can place both semantic and instance segmentation here.
-* masks_machine - contains semantic segmentation masks. Masks for semantic segmentation should have the same name as the original images (but may have a different extension e.g original image name: cats_1.jpg -> mask name cats_1.png).
-* masks_instance - contains for instance segmentation masks. Masks for instance segmentation must be placed in the subdirectories that have the same name as the original images (but without extension e.g original image name: cats_1.jpg -> subdirectory name cats_1).
-* mask* - you can create a directory with a custom name that should starts with "mask".
+* `ann` - contains binary masks, you can place both semantic and instance segmentation here.
+* `masks_machine` - contains semantic segmentation masks. Masks for semantic segmentation should have the same name as the original images (but may have a different extension e.g original image name: cats_1.jpg -> mask name cats_1.png).
+* `masks_instance` - contains for instance segmentation masks. Masks for instance segmentation must be placed in the subdirectories that have the same name as the original images (but without extension e.g original image name: cats_1.jpg -> subdirectory name cats_1).
+* `mask*` - you can create a directory with a custom name that should starts with "mask".
 
 **Demo project ([download](https://github.com/supervisely-ecosystem/import-images-with-masks/releases/download/0.0.1/demo_project.zip))**
 
