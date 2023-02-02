@@ -1,14 +1,6 @@
-import os
-
 import supervisely as sly
-from dotenv import load_dotenv
-
-if sly.is_development():
-    load_dotenv("local.env")
-    load_dotenv(os.path.expanduser("~/supervisely.env"))
-
-import functions as f
 import globals as g
+import functions as f
 
 
 class MyImport(sly.app.Import):
@@ -18,9 +10,7 @@ class MyImport(sly.app.Import):
     def process(self, context: sly.app.Import.Context):
         dir_info = g.api.file.list(context.team_id, g.INPUT_PATH)
         if len(dir_info) == 0:
-            raise FileNotFoundError(
-                f"There are no files in selected directory: '{g.INPUT_PATH}'"
-            )
+            raise FileNotFoundError(f"There are no files in selected directory: '{g.INPUT_PATH}'")
 
         if context.project_id is None:
             project_name = (
@@ -32,12 +22,15 @@ class MyImport(sly.app.Import):
             project = g.api.project.get_info_by_id(context.project_id)
             project_name = project.name
 
-        original_project_path, converted_project_path = f.download_project(
-            api=g.api, input_path=g.INPUT_PATH, team_id=context.team_id
-        )
+        original_project_path = context.path
+        converted_project_path = f"{g.STORAGE_DIR}{g.INPUT_PATH}"
+
         class_color_map = f.get_class_color_map(project_path=original_project_path)
         project_meta = f.get_or_create_project_meta(
-            api=g.api, project_path=original_project_path, classes_mapping=class_color_map, project_id=context.project_id
+            api=g.api,
+            project_path=original_project_path,
+            classes_mapping=class_color_map,
+            project_id=context.project_id,
         )
         project = f.convert_project(
             project_path=original_project_path,
@@ -47,13 +40,12 @@ class MyImport(sly.app.Import):
         )
         f.upload_project(
             api=g.api,
-            # task_id=task_id,
             local_project=project,
             project_name=project_name,
             local_project_path=converted_project_path,
             workspace_id=context.workspace_id,
             project_id=context.project_id,
-            dataset_id=context.dataset_id
+            dataset_id=context.dataset_id,
         )
 
 
