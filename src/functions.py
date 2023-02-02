@@ -17,13 +17,13 @@ def get_project_name_from_input_path(input_path: str) -> str:
     return basename(full_path_dir)
 
 
-def download_project(api: sly.Api, input_path: str) -> tuple:
+def download_project(api: sly.Api, input_path: str, team_id: int) -> tuple:
     remote_proj_dir = input_path
     original_project_path = f"{g.STORAGE_DIR}/original_data/"
     converted_project_path = f"{g.STORAGE_DIR}{remote_proj_dir}/"
     if not exists(original_project_path):
         api.file.download_directory(
-            g.TEAM_ID,
+            team_id,
             remote_path=remote_proj_dir,
             local_save_path=original_project_path,
         )
@@ -54,25 +54,25 @@ def get_class_color_map(project_path: str) -> dict:
 
 
 def merge_meta_and_classes_mapping(
-    api: sly.Api, project_meta: sly.ProjectMeta, classes_mapping: dict
+    api: sly.Api, project_meta: sly.ProjectMeta, classes_mapping: dict, project_id: int
 ) -> sly.ProjectMeta:
     for cls_name in classes_mapping:
         obj_class = project_meta.get_obj_class(cls_name)
         if obj_class is None:
             obj_class = sly.ObjClass(name=cls_name, geometry_type=sly.Bitmap)
             project_meta = project_meta.add_obj_class(obj_class)
-            api.project.update_meta(id=g.PROJECT_ID, meta=project_meta.to_json())
+            api.project.update_meta(id=project_id, meta=project_meta.to_json())
     return project_meta
 
 
 def get_or_create_project_meta(
-    api, project_path: str, classes_mapping: dict
+    api, project_path: str, classes_mapping: dict, project_id: int
 ) -> sly.ProjectMeta:
-    if g.PROJECT_ID is not None:
-        project_meta_json = g.api.project.get_meta(id=g.PROJECT_ID)
+    if project_id is not None:
+        project_meta_json = g.api.project.get_meta(id=project_id)
         project_meta = sly.ProjectMeta.from_json(data=project_meta_json)
         return merge_meta_and_classes_mapping(
-            api=api, project_meta=project_meta, classes_mapping=classes_mapping
+            api=api, project_meta=project_meta, classes_mapping=classes_mapping, project_id=project_id
         )
 
     project_meta_path = join(project_path, "meta.json")
@@ -302,25 +302,28 @@ def convert_project(
 
 def upload_project(
     api: sly.Api,
-    task_id: int,
+    # task_id: int,
     local_project: sly.Project,
     project_name: str,
     local_project_path: str,
+    workspace_id: int,
+    project_id: int,
+    dataset_id: int
 ) -> None:
-    if g.PROJECT_ID is None:
+    if project_id is None:
         project_id, project_name = sly.upload_project(
             dir=local_project_path,
             api=api,
-            workspace_id=g.WORKSPACE_ID,
+            workspace_id=workspace_id,
             project_name=project_name,
             log_progress=True,
         )
-        api.task.set_output_project(
-            task_id=task_id, project_id=project_id, project_name=project_name
-        )
-    elif g.DATASET_ID is not None:
+        # api.task.set_output_project(
+        #     task_id=task_id, project_id=project_id, project_name=project_name
+        # )
+    elif dataset_id is not None:
         datasets = local_project.datasets
-        dataset_name = g.api.dataset.get_info_by_id(g.DATASET_ID).name
+        dataset_name = g.api.dataset.get_info_by_id(dataset_id).name
         for dataset in datasets:
             all_images_names = dataset.get_items_names()
             progress = sly.Progress(
@@ -329,7 +332,7 @@ def upload_project(
             )
             batch_upload(
                 api=api,
-                task_id=task_id,
+                # task_id=task_id,
                 ds_images_names=all_images_names,
                 dataset=dataset,
                 dst_dataset_id=g.DATASET_ID,
@@ -341,7 +344,7 @@ def upload_project(
         datasets = local_project.datasets
         for dataset in datasets:
             dst_dataset = g.api.dataset.create(
-                project_id=g.PROJECT_ID, name=dataset.name, change_name_if_conflict=True
+                project_id=project_id, name=dataset.name, change_name_if_conflict=True
             )
             all_images_names = dataset.get_items_names()
             progress = sly.Progress(
@@ -350,7 +353,7 @@ def upload_project(
             )
             batch_upload(
                 api=api,
-                task_id=task_id,
+                # task_id=task_id,
                 ds_images_names=all_images_names,
                 dataset=dataset,
                 dst_dataset_id=dst_dataset.id,
@@ -361,7 +364,7 @@ def upload_project(
 
 def batch_upload(
     api: sly.Api,
-    task_id: int,
+    # task_id: int,
     ds_images_names: list,
     dataset: sly.Dataset,
     dst_dataset_id: int,
@@ -385,6 +388,6 @@ def batch_upload(
         g.api.annotation.upload_paths(img_ids=images_ids, ann_paths=batched_anns_paths)
         progress.iters_done_report(len(batch))
 
-    api.task.set_output_project(
-        task_id=task_id, project_id=g.PROJECT_ID, project_name=project_name
-    )
+    # api.task.set_output_project(
+    #     task_id=task_id, project_id=g.PROJECT_ID, project_name=project_name
+    # )
