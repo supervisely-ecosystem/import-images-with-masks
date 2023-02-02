@@ -4,6 +4,9 @@ import functions as f
 
 
 class MyImport(sly.app.Import):
+    def is_path_required(self) -> bool:
+        return False
+
     def process(self, context: sly.app.Import.Context):
         dir_info = g.api.file.list(context.team_id, g.INPUT_PATH)
         if len(dir_info) == 0:
