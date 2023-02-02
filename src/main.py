@@ -10,7 +10,8 @@ class MyImport(sly.app.Import):
 
     def process(self, context: sly.app.Import.Context):
         dir_info = g.api.file.list(context.team_id, g.INPUT_PATH)
-        sly.logger.info(f"77777777777777777777777777777777777777777    {g.INPUT_PATH}")
+        sly.logger.info(f"77777777777777777777777777777777777777777    {dir_info}")
+        sly.logger.info(f"77777777777777777777777777777777777777777    {context}")
         if len(dir_info) == 0:
             raise FileNotFoundError(f"There are no files in selected directory: '{g.INPUT_PATH}'")
 
@@ -25,11 +26,8 @@ class MyImport(sly.app.Import):
             project_name = project.name
 
         original_project_path = context.path
-        sly.logger.info(f"77777777777777777777777777777777777777777    {original_project_path}")
-        if original_project_path is None or original_project_path == "":
-            original_project_path = f"{g.STORAGE_DIR}/original_data/"
+
         converted_project_path = f"{g.STORAGE_DIR}{g.INPUT_PATH}"
-        sly.logger.info(f"77777777777777777777777777777777777777777    {original_project_path}")
         class_color_map = f.get_class_color_map(project_path=original_project_path)
         project_meta = f.get_or_create_project_meta(
             api=g.api,
