@@ -25,6 +25,7 @@ class MyImport(sly.app.Import):
             project_name = project.name
 
         original_project_path = context.path
+        sly.logger.info(f"77777777777777777777777777777777777777777    {original_project_path}")
         if original_project_path is None or original_project_path == "":
             original_project_path = os.environ.get("modal.state.slyFolder")
         converted_project_path = f"{g.STORAGE_DIR}{g.INPUT_PATH}"
