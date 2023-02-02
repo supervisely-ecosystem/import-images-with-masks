@@ -1,4 +1,3 @@
-import os
 import supervisely as sly
 import globals as g
 import functions as f
@@ -10,8 +9,6 @@ class MyImport(sly.app.Import):
 
     def process(self, context: sly.app.Import.Context):
         dir_info = g.api.file.list(context.team_id, g.INPUT_PATH)
-        sly.logger.info(f"77777777777777777777777777777777777777777    {dir_info}")
-        sly.logger.info(f"77777777777777777777777777777777777777777    {context}")
         if len(dir_info) == 0:
             raise FileNotFoundError(f"There are no files in selected directory: '{g.INPUT_PATH}'")
 
@@ -26,6 +23,13 @@ class MyImport(sly.app.Import):
             project_name = project.name
 
         original_project_path = context.path
+        if original_project_path is None:
+            original_project_path = f"{g.STORAGE_DIR}/original_data/"
+            g.api.file.download_directory(
+                context.team_id,
+                remote_path=g.INPUT_PATH,
+                local_save_path=original_project_path,
+            )
 
         converted_project_path = f"{g.STORAGE_DIR}{g.INPUT_PATH}"
         class_color_map = f.get_class_color_map(project_path=original_project_path)
