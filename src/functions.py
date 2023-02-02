@@ -306,7 +306,7 @@ def upload_project(
                 api=api,
                 ds_images_names=all_images_names,
                 dataset=dataset,
-                dst_dataset_id=g.DATASET_ID,
+                dst_dataset_id=dataset_id,
                 project_name=project_name,
                 progress=progress,
             )
