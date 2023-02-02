@@ -24,7 +24,7 @@ class MyImport(sly.app.Import):
 
         original_project_path = context.path
         converted_project_path = f"{g.STORAGE_DIR}{g.INPUT_PATH}"
-
+        sly.logger.info(f"77777777777777777777777777777777777777777    {original_project_path}")
         class_color_map = f.get_class_color_map(project_path=original_project_path)
         project_meta = f.get_or_create_project_meta(
             api=g.api,
