@@ -8,6 +8,7 @@ class MyImport(sly.app.Import):
         return False
 
     def process(self, context: sly.app.Import.Context):
+        sly.logger.info(f"7777777777777777777777777777777777                     {g.INPUT_PATH}")
         dir_info = g.api.file.list(context.team_id, g.INPUT_PATH)
         if len(dir_info) == 0:
             raise FileNotFoundError(f"There are no files in selected directory: '{g.INPUT_PATH}'")
@@ -25,9 +26,6 @@ class MyImport(sly.app.Import):
         original_project_path = context.path
         if original_project_path is None:
             original_project_path = f"{g.STORAGE_DIR}/original_data/"
-            sly.logger.info(
-                f"7777777777777777777777777777777777                     {g.INPUT_PATH}"
-            )
             g.api.file.download_directory(
                 context.team_id,
                 remote_path=g.INPUT_PATH,
