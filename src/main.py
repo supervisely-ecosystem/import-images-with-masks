@@ -25,6 +25,9 @@ class MyImport(sly.app.Import):
         original_project_path = context.path
         if original_project_path is None:
             original_project_path = f"{g.STORAGE_DIR}/original_data/"
+            sly.logger.info(
+                f"7777777777777777777777777777777777                     {g.INPUT_PATH}"
+            )
             g.api.file.download_directory(
                 context.team_id,
                 remote_path=g.INPUT_PATH,
