@@ -38,7 +38,6 @@ if os.environ.get("modal.state.slyDatasetId") is not None:
 INPUT_PATH = os.environ.get("modal.state.files", None)
 if INPUT_PATH is None or INPUT_PATH == "":
     INPUT_PATH = os.environ.get("modal.state.slyFolder")
-sly.logger.info(f"55555555555555555555555555555555555555555555             {INPUT_PATH}")
 
 IMAGE_DIR_NAME = "img"
 ANNOTATION_DIR_NAME = "ann"

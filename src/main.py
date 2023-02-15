@@ -9,9 +9,6 @@ import globals as g
 @sly.timeit
 def import_images_with_masks(api: sly.Api, task_id: int):
     dir_info = api.file.list(g.TEAM_ID, g.INPUT_PATH)
-    sly.logger.info(
-        f"dir_info_dir_info_dir_info_dir_info_dir_info_dir_info_dir_info_dir_info_   {dir_info}"
-    )
     if len(dir_info) == 0:
         raise FileNotFoundError(f"There are no files in selected directory: '{g.INPUT_PATH}'")
 
