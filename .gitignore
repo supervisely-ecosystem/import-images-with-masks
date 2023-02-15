@@ -4,4 +4,3 @@ secret_debug.env
 venv
 src/debug
 __pycache__
-.vscode
