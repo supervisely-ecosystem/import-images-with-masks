@@ -21,7 +21,6 @@ def download_project(api: sly.Api, input_path: str) -> tuple:
     remote_proj_dir = input_path
     original_project_path = f"{g.STORAGE_DIR}/original_data/"
     converted_project_path = f"{g.STORAGE_DIR}{remote_proj_dir}/"
-    dir_info = api.file.list(g.TEAM_ID, remote_proj_dir)
     if not exists(original_project_path):
         api.file.download_directory(
             g.TEAM_ID,
