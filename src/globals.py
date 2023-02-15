@@ -36,7 +36,6 @@ if os.environ.get("modal.state.slyDatasetId") is not None:
     DATASET_ID = int(os.environ.get("modal.state.slyDatasetId"))
 
 INPUT_PATH = os.environ.get("modal.state.files", None)
-sly.logger.info(f"55555555555555555555555555555555555555555555             {INPUT_PATH}")
 if INPUT_PATH is None or INPUT_PATH == "":
     INPUT_PATH = os.environ.get("modal.state.slyFolder")
 sly.logger.info(f"55555555555555555555555555555555555555555555             {INPUT_PATH}")
