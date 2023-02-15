@@ -47,9 +47,7 @@ def get_datasets(project_path: str) -> tuple:
 def get_class_color_map(project_path: str) -> dict:
     class_color_map_path = join(project_path, g.COLOR_MAP_FILE_NAME)
     if not exists(class_color_map_path):
-        raise FileNotFoundError(
-            f"Classes mapping file: {g.COLOR_MAP_FILE_NAME} not found."
-        )
+        raise FileNotFoundError(f"Classes mapping file: {g.COLOR_MAP_FILE_NAME} not found.")
     return load_json_file(class_color_map_path)
 
 
@@ -65,9 +63,7 @@ def merge_meta_and_classes_mapping(
     return project_meta
 
 
-def get_or_create_project_meta(
-    api, project_path: str, classes_mapping: dict
-) -> sly.ProjectMeta:
+def get_or_create_project_meta(api, project_path: str, classes_mapping: dict) -> sly.ProjectMeta:
     if g.PROJECT_ID is not None:
         project_meta_json = g.api.project.get_meta(id=g.PROJECT_ID)
         project_meta = sly.ProjectMeta.from_json(data=project_meta_json)
@@ -133,12 +129,8 @@ def get_dataset_masks(dataset_path: str, images_names: list) -> dict:
         mask_dir_items = list(os.listdir(mask_dir))
 
         if len(mask_dir_items) != len(images_names) and not is_warned_missing:
-            mask_dir_items_names = [
-                get_file_name(item_name) for item_name in mask_dir_items
-            ]
-            missing_masks = ", ".join(
-                map(str, list(set(images_names) - set(mask_dir_items_names)))
-            )
+            mask_dir_items_names = [get_file_name(item_name) for item_name in mask_dir_items]
+            missing_masks = ", ".join(map(str, list(set(images_names) - set(mask_dir_items_names))))
             sly.logger.warn(f"Masks for images: {missing_masks} are missing.")
             is_warned_missing = True
 
@@ -149,9 +141,7 @@ def get_dataset_masks(dataset_path: str, images_names: list) -> dict:
             if isfile(item_path):
                 mimetype = mime.from_file(item_path)
                 if not mimetype.startswith("image"):
-                    sly.logger.warn(
-                        f"{item_path} is not an image (mimetype: {mimetype})"
-                    )
+                    sly.logger.warn(f"{item_path} is not an image (mimetype: {mimetype})")
                 masks_map["semantic"].append({get_file_name(item_name): item_path})
             else:
                 instance_masks = sly.fs.list_files(item_path)
@@ -161,17 +151,13 @@ def get_dataset_masks(dataset_path: str, images_names: list) -> dict:
                     if mimetype.startswith("image"):
                         validated_masks.append(mask_path)
                     else:
-                        sly.logger.warn(
-                            f"{mask_path} is not an image (mimetype: {mimetype})"
-                        )
+                        sly.logger.warn(f"{mask_path} is not an image (mimetype: {mimetype})")
                     masks_map["instance"].append({basename(item_path): validated_masks})
 
     return masks_map
 
 
-def get_mask_path(
-    masks_map: dict, images_names: list, current_image_name: str
-) -> tuple:
+def get_mask_path(masks_map: dict, images_names: list, current_image_name: str) -> tuple:
     semantic_masks = masks_map["semantic"]
     for item in semantic_masks:
         if semantic_masks != masks_map["semantic"]:
@@ -285,9 +271,7 @@ def convert_project(
                         obj_classes=project_meta.obj_classes,
                     )
                 ann = ann.add_labels(labels=semantic_labels + instance_labels)
-                dataset.add_item_file(
-                    item_name=image_name_with_ext, item_path=image_path, ann=ann
-                )
+                dataset.add_item_file(item_name=image_name_with_ext, item_path=image_path, ann=ann)
 
             except Exception as e:
                 exc_str = str(e)
@@ -385,6 +369,4 @@ def batch_upload(
         g.api.annotation.upload_paths(img_ids=images_ids, ann_paths=batched_anns_paths)
         progress.iters_done_report(len(batch))
 
-    api.task.set_output_project(
-        task_id=task_id, project_id=g.PROJECT_ID, project_name=project_name
-    )
+    api.task.set_output_project(task_id=task_id, project_id=g.PROJECT_ID, project_name=project_name)
