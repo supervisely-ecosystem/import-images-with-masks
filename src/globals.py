@@ -1,26 +1,17 @@
 import os
-import sys
 from distutils.util import strtobool
 
 import supervisely as sly
 from fastapi import FastAPI
 from supervisely.app.fastapi import create
+from dotenv import load_dotenv
 
-app_root_directory = os.path.dirname(os.getcwd())
-sys.path.append(app_root_directory)
-sys.path.append(os.path.join(app_root_directory, "src"))
-print(f"App root directory: {app_root_directory}")
-sly.logger.info(f'PYTHONPATH={os.environ.get("PYTHONPATH", "")}')
-
-# order matters
-# from dotenv import load_dotenv
-# load_dotenv(os.path.join(app_root_directory, "secret_debug.env"))
-# load_dotenv(os.path.join(app_root_directory, "debug.env"))
+if sly.is_development():
+    load_dotenv("local.env")
+    load_dotenv(os.path.expanduser("~/supervisely.env"))
 
 app = FastAPI()
-
 sly_app = create()
-
 api = sly.Api.from_env()
 
 TASK_ID = int(os.environ["TASK_ID"])

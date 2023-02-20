@@ -1,17 +1,23 @@
-import os
-
 import supervisely as sly
-
+import time
 import functions as f
 import globals as g
 
 
 @sly.timeit
 def import_images_with_masks(api: sly.Api, task_id: int):
+    # PART 1
+    start_time = time.time()
     dir_info = api.file.list(g.TEAM_ID, g.INPUT_PATH)
     if len(dir_info) == 0:
         raise FileNotFoundError(f"There are no files in selected directory: '{g.INPUT_PATH}'")
 
+    end_time = time.time()
+    print(f"Part 1 | Time taken by: {end_time - start_time} seconds")
+    sly.logger.debug(f"Part 1 | Time taken by: {end_time - start_time} seconds")
+
+    # PART 2
+    start_time = time.time()
     if g.PROJECT_ID is None:
         project_name = (
             f.get_project_name_from_input_path(g.INPUT_PATH)
@@ -29,12 +35,24 @@ def import_images_with_masks(api: sly.Api, task_id: int):
     project_meta = f.get_or_create_project_meta(
         api=api, project_path=original_project_path, classes_mapping=class_color_map
     )
+    end_time = time.time()
+    print(f"Part 2 | Time taken by: {end_time - start_time} seconds")
+    sly.logger.debug(f"Part 2 | Time taken by: {end_time - start_time} seconds")
+
+    # PART 3
+    start_time = time.time()
     project = f.convert_project(
         project_path=original_project_path,
         new_project_path=converted_project_path,
         project_meta=project_meta,
         classes_map=class_color_map,
     )
+    end_time = time.time()
+    print(f"Part 3 | Time taken by: {end_time - start_time} seconds")
+    sly.logger.debug(f"Part 3 | Time taken by: {end_time - start_time} seconds")
+
+    # PART 4
+    start_time = time.time()
     f.upload_project(
         api=api,
         task_id=task_id,
@@ -42,6 +60,9 @@ def import_images_with_masks(api: sly.Api, task_id: int):
         project_name=project_name,
         local_project_path=converted_project_path,
     )
+    end_time = time.time()
+    print(f"Part 4 | Time taken by: {end_time - start_time} seconds")
+    sly.logger.debug(f"Part 4 | Time taken by: {end_time - start_time} seconds")
 
 
 if __name__ == "__main__":
