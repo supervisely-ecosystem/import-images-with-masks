@@ -10,6 +10,7 @@ from supervisely.io.fs import get_file_name, get_file_name_with_ext
 from supervisely.io.json import load_json_file
 
 import globals as g
+import download_progress
 
 
 def get_project_name_from_input_path(input_path: str) -> str:
@@ -21,11 +22,17 @@ def download_project(api: sly.Api, input_path: str) -> tuple:
     remote_proj_dir = input_path
     original_project_path = f"{g.STORAGE_DIR}/original_data/"
     converted_project_path = f"{g.STORAGE_DIR}{remote_proj_dir}/"
+
+    sizeb = api.file.get_directory_size(g.TEAM_ID, remote_proj_dir)
+    progress_cb = download_progress.get_progress_cb(
+        api, g.TASK_ID, f"Downloading {input_path.strip('/')}", sizeb, is_size=True
+    )
     if not exists(original_project_path):
         api.file.download_directory(
             g.TEAM_ID,
             remote_path=remote_proj_dir,
             local_save_path=original_project_path,
+            progress_cb=progress_cb,
         )
     return original_project_path, converted_project_path
 
@@ -236,6 +243,7 @@ def convert_project(
     project = sly.Project(directory=new_project_path, mode=sly.OpenMode.CREATE)
     project.set_meta(project_meta)
     dataset_names, dataset_paths = get_datasets(project_path=project_path)
+    ds_progress = sly.Progress("Processing Datasets", len(dataset_names))
     for dataset_name, dataset_path in zip(dataset_names, dataset_paths):
         dataset = project.create_dataset(dataset_name)
         img_dir = join(dataset_path, g.IMAGE_DIR_NAME)
@@ -281,6 +289,7 @@ def convert_project(
                     extra={"exc_str": exc_str, "image": image_path},
                 )
             progress.iter_done_report()
+        ds_progress.iter_done_report()
     return project
 
 
