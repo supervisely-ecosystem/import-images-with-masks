@@ -243,6 +243,7 @@ def convert_project(
     project = sly.Project(directory=new_project_path, mode=sly.OpenMode.CREATE)
     project.set_meta(project_meta)
     dataset_names, dataset_paths = get_datasets(project_path=project_path)
+    ds_progress = sly.Progress("Processing Datasets", len(dataset_names))
     for dataset_name, dataset_path in zip(dataset_names, dataset_paths):
         dataset = project.create_dataset(dataset_name)
         img_dir = join(dataset_path, g.IMAGE_DIR_NAME)
@@ -288,6 +289,7 @@ def convert_project(
                     extra={"exc_str": exc_str, "image": image_path},
                 )
             progress.iter_done_report()
+        ds_progress.iter_done_report()
     return project
 
 
