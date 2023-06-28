@@ -133,9 +133,9 @@ Drag & Drop                                     From Team Files
 │   ├── image_2.png                             │   ├── image_2.png
 │   └── image_3.png                             │   └── image_3.png
 └── img                                         └── img
-    ├── image_1.png                             ├── image_1.png
-    ├── image_2.png                             ├── image_2.png
-    └── image_3.png                             └── image_3.png
+    ├── image_1.png                                 ├── image_1.png
+    ├── image_2.png                                 ├── image_2.png
+    └── image_3.png                                 └── image_3.png
 ```
 
 ## How To Run
