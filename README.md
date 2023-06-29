@@ -43,7 +43,7 @@ Images should be in the folder `"img"` and masks should be in one (or more) of t
 
 In this configuration example all pixels in the mask which value **equal to 170** will be combined in one Bitmap figure and will be assigned to the class **"Lemon"** and **equal to 85** will be assigned to the class **"Kiwi"**.
 
-![](https://i.imgur.com/a5cVpAB.png)
+![](media/smmex.png)
 
 
 **Instance masks example**
