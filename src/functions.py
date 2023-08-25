@@ -19,21 +19,20 @@ def get_project_name_from_input_path(input_path: str) -> str:
 
 
 def download_project(api: sly.Api, input_path: str) -> tuple:
-    original_project_path = f"{g.STORAGE_DIR}/original_data/"
-    # converted_project_path = f"{g.STORAGE_DIR}{input_path}/"
+    local_save_path = f"{g.STORAGE_DIR}/input_data/"
 
     sizeb = api.file.get_directory_size(g.TEAM_ID, input_path)
     progress_cb = download_progress.get_progress_cb(
         api, g.TASK_ID, f"Downloading {input_path.strip('/')}", sizeb, is_size=True
     )
-    if not exists(original_project_path):
+    if not exists(local_save_path):
         api.file.download_directory(
             g.TEAM_ID,
             remote_path=input_path,
-            local_save_path=original_project_path,
+            local_save_path=local_save_path,
             progress_cb=progress_cb,
         )
-    return original_project_path  # , converted_project_path
+    return local_save_path
 
 
 def get_datasets(project_path: str) -> tuple:

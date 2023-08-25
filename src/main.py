@@ -22,11 +22,11 @@ def import_images_with_masks(api: sly.Api, task_id: int):
 
     sly.logger.debug(f"Will download project to local storage: {g.INPUT_PATH}")
 
-    original_project_path = f.download_project(api=api, input_path=g.INPUT_PATH)
+    local_save_path = f.download_project(api=api, input_path=g.INPUT_PATH)
 
-    sly.logger.debug(f"Project downloaded to local storage: {original_project_path}")
+    sly.logger.debug(f"Project downloaded to local storage: {local_save_path}")
 
-    for directory in sly.fs.dirs_with_marker(original_project_path, g.COLOR_MAP_FILE_NAME):
+    for directory in sly.fs.dirs_with_marker(local_save_path, g.COLOR_MAP_FILE_NAME):
         sly.logger.debug(f"Processing directory: {directory}...")
         try:
             class_color_map = f.get_class_color_map(project_path=directory)
@@ -34,8 +34,7 @@ def import_images_with_masks(api: sly.Api, task_id: int):
                 api=api, project_path=directory, classes_mapping=class_color_map
             )
 
-            parent_directory = os.path.dirname(directory)
-            converted_project_path = os.path.join(parent_directory, g.INPUT_PATH)
+            converted_project_path = os.path.join(directory, "converted")
             sly.logger.debug(f"Converted project path: {converted_project_path}")
 
             project = f.convert_project(
