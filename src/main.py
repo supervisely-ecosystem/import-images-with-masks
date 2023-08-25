@@ -28,32 +28,32 @@ def import_images_with_masks(api: sly.Api, task_id: int):
 
     for directory in sly.fs.dirs_with_marker(local_save_path, g.COLOR_MAP_FILE_NAME):
         sly.logger.debug(f"Processing directory: {directory}...")
-        try:
-            class_color_map = f.get_class_color_map(project_path=directory)
-            project_meta = f.get_or_create_project_meta(
-                api=api, project_path=directory, classes_mapping=class_color_map
-            )
+        # try:
+        class_color_map = f.get_class_color_map(project_path=directory)
+        project_meta = f.get_or_create_project_meta(
+            api=api, project_path=directory, classes_mapping=class_color_map
+        )
 
-            converted_project_path = os.path.join(directory, "converted")
-            sly.logger.debug(f"Converted project path: {converted_project_path}")
+        converted_project_path = os.path.join(directory, "converted")
+        sly.logger.debug(f"Converted project path: {converted_project_path}")
 
-            project = f.convert_project(
-                project_path=directory,
-                new_project_path=converted_project_path,
-                project_meta=project_meta,
-                classes_map=class_color_map,
-            )
+        project = f.convert_project(
+            project_path=directory,
+            new_project_path=converted_project_path,
+            project_meta=project_meta,
+            classes_map=class_color_map,
+        )
 
-            f.upload_project(
-                api=api,
-                task_id=task_id,
-                local_project=project,
-                project_name=project_name,
-                local_project_path=converted_project_path,
-            )
-            sly.logger.info(f"Project {directory} was uploaded successfully")
-        except Exception as e:
-            sly.logger.info(f"Project {directory} wasn't uploaded. Error: {e}")
+        f.upload_project(
+            api=api,
+            task_id=task_id,
+            local_project=project,
+            project_name=project_name,
+            local_project_path=converted_project_path,
+        )
+        sly.logger.info(f"Project {directory} was uploaded successfully")
+        # except Exception as e:
+        #    sly.logger.info(f"Project {directory} wasn't uploaded. Error: {e}")
 
     sly.logger.info(f"Finished processing all directories in {g.INPUT_PATH}")
 
