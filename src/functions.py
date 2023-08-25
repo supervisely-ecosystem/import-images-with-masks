@@ -18,10 +18,10 @@ def get_project_name_from_input_path(input_path: str) -> str:
     return basename(full_path_dir)
 
 
-def download_project(api: sly.Api, input_path: str) -> tuple:
+def download_project(api: sly.Api, input_path: str, idx: int) -> tuple:
     remote_proj_dir = input_path
-    original_project_path = f"{g.STORAGE_DIR}/original_data/"
-    converted_project_path = f"{g.STORAGE_DIR}{remote_proj_dir}/"
+    original_project_path = os.path.join(g.STORAGE_DIR, idx, "original_data")
+    converted_project_path = os.path.join(g.STORAGE_DIR, idx, remote_proj_dir)
 
     sizeb = api.file.get_directory_size(g.TEAM_ID, remote_proj_dir)
     progress_cb = download_progress.get_progress_cb(
