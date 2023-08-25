@@ -51,3 +51,4 @@ REMOVE_SOURCE = bool(strtobool(os.getenv("modal.state.remove_source")))
 MATCH_ALL = "__all__"
 
 STORAGE_DIR = sly.app.get_data_dir()
+sly.fs.clean_dir(STORAGE_DIR)

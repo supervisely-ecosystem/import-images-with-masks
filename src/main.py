@@ -1,23 +1,15 @@
+import os
 import supervisely as sly
-import time
 import functions as f
 import globals as g
 
 
 @sly.timeit
 def import_images_with_masks(api: sly.Api, task_id: int):
-    # PART 1 Listing TF Folder
-    # start_time = time.time()
     dir_info = api.file.list(g.TEAM_ID, g.INPUT_PATH)
     if len(dir_info) == 0:
         raise FileNotFoundError(f"There are no files in selected directory: '{g.INPUT_PATH}'")
 
-    # end_time = time.time()
-    # print(f"Part 1 Listing TF Folder | Time taken by: {end_time - start_time} seconds")
-    # sly.logger.debug(f"Part 1 Listing TF Folder | Time taken by: {end_time - start_time} seconds")
-
-    # PART 2 Download Folder
-    # start_time = time.time()
     if g.PROJECT_ID is None:
         project_name = (
             f.get_project_name_from_input_path(g.INPUT_PATH)
@@ -28,41 +20,61 @@ def import_images_with_masks(api: sly.Api, task_id: int):
         project = api.project.get_info_by_id(g.PROJECT_ID)
         project_name = project.name
 
-    original_project_path, converted_project_path = f.download_project(
-        api=api, input_path=g.INPUT_PATH
-    )
-    class_color_map = f.get_class_color_map(project_path=original_project_path)
-    project_meta = f.get_or_create_project_meta(
-        api=api, project_path=original_project_path, classes_mapping=class_color_map
-    )
-    # end_time = time.time()
-    # print(f"Part 2 Download Folder | Time taken by: {end_time - start_time} seconds")
-    # sly.logger.debug(f"Part 2 Download Folder | Time taken by: {end_time - start_time} seconds")
+    download_path = f.download_project(api=api)
 
-    # PART 3 Convert Project
-    # start_time = time.time()
-    project = f.convert_project(
-        project_path=original_project_path,
-        new_project_path=converted_project_path,
-        project_meta=project_meta,
-        classes_map=class_color_map,
-    )
-    # end_time = time.time()
-    # print(f"Part 3 Convert Project | Time taken by: {end_time - start_time} seconds")
-    # sly.logger.debug(f"Part 3 Convert Project | Time taken by: {end_time - start_time} seconds")
+    uploaded = 0
 
-    # PART 4 Upload Project
-    # start_time = time.time()
-    f.upload_project(
-        api=api,
-        task_id=task_id,
-        local_project=project,
-        project_name=project_name,
-        local_project_path=converted_project_path,
-    )
-    # end_time = time.time()
-    # print(f"Part 4 Upload Project | Time taken by: {end_time - start_time} seconds")
-    # sly.logger.debug(f"Part 4 Upload Project | Time taken by: {end_time - start_time} seconds")
+    for directory in sly.fs.dirs_with_marker(download_path, g.COLOR_MAP_FILE_NAME):
+        try:
+            sly.logger.debug(f"Processing directory: {directory}")
+
+            class_color_map = f.get_class_color_map(project_path=directory)
+
+            sly.logger.debug("Class color map readed successfully...")
+
+            project_meta = f.get_or_create_project_meta(
+                api=api, project_path=directory, classes_mapping=class_color_map
+            )
+
+            sly.logger.debug("Project meta readed successfully...")
+
+            converted_project_path = os.path.join(
+                os.path.dirname(os.path.dirname(directory)), "converted"
+            )
+
+            sly.logger.debug(f"Will try to convert project to: {converted_project_path}...")
+
+            project = f.convert_project(
+                project_path=directory,
+                new_project_path=converted_project_path,
+                project_meta=project_meta,
+                classes_map=class_color_map,
+            )
+
+            sly.logger.info(f"Project from directory: {directory} converted successfully...")
+
+            f.upload_project(
+                api=api,
+                task_id=task_id,
+                local_project=project,
+                project_name=project_name,
+                local_project_path=converted_project_path,
+            )
+
+            uploaded += 1
+
+            sly.logger.info(f"Project from directory: {directory} uploaded successfully...")
+        except Exception as error:
+            sly.logger.warning(
+                f"Project from directory: {directory} was not uploaded. Error: {error}"
+            )
+
+    sly.logger.info("Finished processing all directories")
+
+    if not uploaded:
+        raise RuntimeError("The inout data doesn't contain any valid directories.")
+    else:
+        sly.logger.info(f"Succesfully uploaded {uploaded} projects.")
 
 
 if __name__ == "__main__":
