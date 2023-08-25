@@ -18,15 +18,17 @@
 
 ## Overview
 
+🗄️ Starting from version 1.0.11 the application supports the import of multiple projects at once. Each project should be placed in a separate directory with the correct structure (see below).
+
 This app allows you to upload images with annotations in the format of PNG masks. Masks are 3-(1-)channel images containing only pixels that have the same values in all channels, to map pixels masks with appropriate class app requires `obj_class_to_machine_color.json` file to match classes and colors, otherwise app won't start.
-App supports both semantic and instance segmentation masks.  Backward compatible with [`export as masks`](https://github.com/supervisely-ecosystem/export-as-masks) app.
+App supports both semantic and instance segmentation masks. Backward compatible with [`export as masks`](https://github.com/supervisely-ecosystem/export-as-masks) app.
 
 Images should be in the folder `"img"` and masks should be in one (or more) of the following folders below:
 
-* `ann` - contains binary masks, you can place both semantic and instance segmentation here.
-* `masks_machine` - contains semantic segmentation masks. Masks for semantic segmentation should have the same name as the original images (but may have a different extension e.g original image name: `cats_1.jpg` -> mask name `cats_1.png`).
-* `masks_instance` - contains for instance segmentation masks. Masks for instance segmentation must be placed in the subdirectories that have the same name as the original images (but without extension e.g original image name: `cats_1.jpg` -> subdirectory name `cats_1`).
-* `mask*` - you can create a directory with a custom name that should starts with "mask".
+- `ann` - contains binary masks, you can place both semantic and instance segmentation here.
+- `masks_machine` - contains semantic segmentation masks. Masks for semantic segmentation should have the same name as the original images (but may have a different extension e.g original image name: `cats_1.jpg` -> mask name `cats_1.png`).
+- `masks_instance` - contains for instance segmentation masks. Masks for instance segmentation must be placed in the subdirectories that have the same name as the original images (but without extension e.g original image name: `cats_1.jpg` -> subdirectory name `cats_1`).
+- `mask*` - you can create a directory with a custom name that should starts with "mask".
 
 **Demo project ([download](https://github.com/supervisely-ecosystem/import-images-with-masks/releases/download/0.0.1/demo_project.zip))**
 
@@ -34,8 +36,8 @@ Images should be in the folder `"img"` and masks should be in one (or more) of t
 
 ```json
 {
-   "Lemon": 170,
-   "Kiwi": 85
+  "Lemon": 170,
+  "Kiwi": 85
 }
 ```
 
@@ -44,7 +46,6 @@ Images should be in the folder `"img"` and masks should be in one (or more) of t
 In this configuration example all pixels in the mask which value **equal to 170** will be combined in one Bitmap figure and will be assigned to the class **"Lemon"** and **equal to 85** will be assigned to the class **"Kiwi"**.
 
 ![](https://i.imgur.com/a5cVpAB.png)
-
 
 **Instance masks example**
 
@@ -56,7 +57,8 @@ As a result we will have an image `cats_1.jpg` with 2 labels `cat` and `cat`.
   <img src="https://user-images.githubusercontent.com/48913536/182435346-a57da6a0-15d0-4f24-a17d-9063bc962b57.png" width="500"/>
 </div>
 
-### ⚠️ Notice  
+### ⚠️ Notice
+
 If you just want to import semantic segmentation masks, just drag & drop original images, semantic segmentation masks and obj_class_to_machine_color.json file. Same for instance segmentation masks, you don't have to create all directories if this is unnessecary.
 
 **Input data structure example:**
@@ -65,7 +67,7 @@ If you just want to import semantic segmentation masks, just drag & drop origina
 
 ```text
 Drag & Drop                                     From Team Files
-                                            
+
 .                                              directory_with_import_data
 ├── obj_class_to_machine_color.json            ├── obj_class_to_machine_color.json
 ├── cats                                       ├── cats
@@ -117,10 +119,11 @@ Drag & Drop                                     From Team Files
 ```
 
 In this configuration example if we run app from Ecosystem without specified project:
-* a new project will be created with 2 datasets: cats, dogs
-* 2 classes: cat, dog. Images names in `mask_machine` directory must match original images names in `img` directory
-* Subdirectories in `mask_instances` directory must match original images names in `img` directory without extensions
-* Instance masks names define class name
+
+- a new project will be created with 2 datasets: cats, dogs
+- 2 classes: cat, dog. Images names in `mask_machine` directory must match original images names in `img` directory
+- Subdirectories in `mask_instances` directory must match original images names in `img` directory without extensions
+- Instance masks names define class name
 
 **2. Only images with masks (all images will be placed in "ds0")**
 
@@ -139,6 +142,7 @@ Drag & Drop                                     From Team Files
 ```
 
 ## How To Run
+
 ### Run from Ecosystem:
 
 **Step 1**: Locate the app in Ecosystem and run it
@@ -161,7 +165,7 @@ Drag & Drop                                     From Team Files
 
 ### Import to existing Images Project:
 
-**Step 1**: Open context menu of images project -> `Run app` -> `Import`  -> `Import images with masks`
+**Step 1**: Open context menu of images project -> `Run app` -> `Import` -> `Import images with masks`
 
 <div align="center" markdown>
 <img src="https://user-images.githubusercontent.com/48913536/182565103-f0cf16fd-b5ae-4032-b33c-db12d5d2da9a.png"/>
@@ -181,7 +185,7 @@ Drag & Drop                                     From Team Files
 
 ### Import to existing Images Dataset:
 
-**Step 1**: Open context menu of images dataset -> `Run app` -> `Import`  -> `Import images with masks`
+**Step 1**: Open context menu of images dataset -> `Run app` -> `Import` -> `Import images with masks`
 
 <div align="center" markdown>
 <img src="https://user-images.githubusercontent.com/48913536/182565145-793fe6fd-a53d-44ba-913c-1ccc0d0ca9d4.png"/>
