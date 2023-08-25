@@ -34,12 +34,12 @@ def import_images_with_masks(api: sly.Api, task_id: int):
             api=api, project_path=directory, classes_mapping=class_color_map
         )
 
-        converted_project_path = os.path.join(directory, "converted")
-        sly.logger.debug(f"Converted project path: {converted_project_path}")
+        # converted_project_path = os.path.join(directory, "converted")
+        # sly.logger.debug(f"Converted project path: {converted_project_path}")
 
         project = f.convert_project(
             project_path=directory,
-            new_project_path=converted_project_path,
+            new_project_path=directory,
             project_meta=project_meta,
             classes_map=class_color_map,
         )
@@ -49,7 +49,7 @@ def import_images_with_masks(api: sly.Api, task_id: int):
             task_id=task_id,
             local_project=project,
             project_name=project_name,
-            local_project_path=converted_project_path,
+            local_project_path=directory,
         )
         sly.logger.info(f"Project {directory} was uploaded successfully")
         # except Exception as e:
