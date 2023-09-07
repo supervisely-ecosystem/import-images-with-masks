@@ -64,7 +64,7 @@ If you just want to import semantic segmentation masks, just drag & drop origina
 **Input data structure example:**
 
 **1. Images in datasets (new dataset will be created for each folder in the root of imported data)**<br>
-ℹ️ You can download the archive with data example [here]([https://github.com/supervisely-ecosystem/import-images/files/12537000/my_images_project.zip](https://github.com/supervisely-ecosystem/import-images-with-masks/files/12546340/lemons-project.zip)).
+ℹ️ You can download the archive with data example [here](https://github.com/supervisely-ecosystem/import-images-with-masks/files/12546340/lemons-project.zip).
 
 ```text
 Drag & Drop                                     From Team Files
