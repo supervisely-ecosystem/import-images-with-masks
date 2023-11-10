@@ -72,7 +72,7 @@ def import_images_with_masks(api: sly.Api, task_id: int):
     sly.logger.info("Finished processing all directories")
 
     if not uploaded:
-        raise RuntimeError("The inout data doesn't contain any valid directories.")
+        raise RuntimeError("The input data doesn't contain any valid directories.")
     else:
         sly.logger.info(f"Succesfully uploaded {uploaded} projects.")
 
