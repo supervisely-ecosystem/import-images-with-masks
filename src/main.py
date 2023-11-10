@@ -1,10 +1,14 @@
 import os
 import supervisely as sly
+
+from supervisely import handle_exceptions
+
 import functions as f
 import globals as g
 
 
 @sly.timeit
+@handle_exceptions
 def import_images_with_masks(api: sly.Api, task_id: int):
     dir_info = api.file.list(g.TEAM_ID, g.INPUT_PATH)
     if len(dir_info) == 0:
@@ -77,7 +81,7 @@ def import_images_with_masks(api: sly.Api, task_id: int):
         sly.logger.info(f"Succesfully uploaded {uploaded} projects.")
 
 
-if __name__ == "__main__":
+def main():
     sly.logger.info(
         "Script arguments",
         extra={
@@ -86,8 +90,11 @@ if __name__ == "__main__":
             "modal.state.slyFolder": g.INPUT_PATH,
         },
     )
-
     import_images_with_masks(g.api, g.TASK_ID)
+
+
+if __name__ == "__main__":
+    sly.main_wrapper("main", main)
     try:
         sly.app.fastapi.shutdown()
     except KeyboardInterrupt:
