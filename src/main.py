@@ -10,6 +10,8 @@ import globals as g
 @sly.timeit
 @handle_exceptions
 def import_images_with_masks(api: sly.Api, task_id: int):
+    if g.INPUT_PATH is None:
+        raise Exception("Please, upload a directory with images and masks. Read more in app overview.")
     dir_info = api.file.list(g.TEAM_ID, g.INPUT_PATH)
     if len(dir_info) == 0:
         raise FileNotFoundError(f"There are no files in selected directory: '{g.INPUT_PATH}'")
