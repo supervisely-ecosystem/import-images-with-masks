@@ -19,6 +19,10 @@ def get_project_name_from_input_path(input_path: str) -> str:
 
 
 def download_project(api: sly.Api, save_path) -> tuple:
+    # TDOO: remove this after testing
+    api.file.get_info_by_path(g.TEAM_ID, "/import/import-images-with-masks/2023-12-20 00:03:50.191/robots_project.zip").abc
+
+
     api.file.download_input(save_path, log_progress=True)
     list_dir = os.listdir(save_path)
 
