@@ -15,7 +15,7 @@ import globals as g
 def get_project_name_from_input_path(input_path: str) -> str:
     if isdir(input_path):
         return basename(normpath(input_path))
-    raise
+    raise ValueError(f"Input path: {input_path} is not a directory.")
 
 
 def download_project(api: sly.Api, save_path) -> tuple:

@@ -23,9 +23,13 @@ if os.environ.get("modal.state.slyProjectId") is not None:
 if os.environ.get("modal.state.slyDatasetId") is not None:
     DATASET_ID = int(os.environ.get("modal.state.slyDatasetId"))
 
-INPUT_PATH = os.environ.get("modal.state.files", None)
-if INPUT_PATH is None or INPUT_PATH == "":
-    INPUT_PATH = os.environ.get("modal.state.slyFolder")
+INPUT_PATH = os.environ.get("modal.state.files", "")
+if INPUT_PATH != "":
+    # set env variable for future usage
+    if INPUT_PATH.endswith("/"):
+        os.environ["modal.state.slyFolder"] = INPUT_PATH
+    else:
+        os.environ["modal.state.slyFile"] = INPUT_PATH
 
 IMAGE_DIR_NAME = "img"
 ANNOTATION_DIR_NAME = "ann"
