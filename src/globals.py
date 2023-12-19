@@ -2,16 +2,13 @@ import os
 from distutils.util import strtobool
 
 import supervisely as sly
-from fastapi import FastAPI
-from supervisely.app.fastapi import create
 from dotenv import load_dotenv
 
 if sly.is_development():
     load_dotenv("local.env")
     load_dotenv(os.path.expanduser("~/supervisely.env"))
 
-app = FastAPI()
-sly_app = create()
+my_app = sly.AppService()
 api = sly.Api.from_env()
 
 TASK_ID = int(os.environ["TASK_ID"])
@@ -50,5 +47,10 @@ OUTPUT_PROJECT_NAME = os.environ.get("modal.state.project_name", "")
 REMOVE_SOURCE = bool(strtobool(os.getenv("modal.state.remove_source")))
 MATCH_ALL = "__all__"
 
-STORAGE_DIR = sly.app.get_data_dir()
-sly.fs.clean_dir(STORAGE_DIR)
+ABSOLUTE_PATH = os.path.dirname(os.path.abspath(__file__))
+PARENT_DIR = os.path.dirname(ABSOLUTE_PATH)
+sly.logger.debug(f"Absolute path: {ABSOLUTE_PATH}, parent dir: {PARENT_DIR}")
+
+DOWNLOAD_DIR = os.path.join(PARENT_DIR, "images_project")
+sly.fs.mkdir(DOWNLOAD_DIR, remove_content_if_exists=True)
+sly.logger.info(f"App starting... DOWNLOAD_DIR: {DOWNLOAD_DIR}")
