@@ -5,11 +5,7 @@ import functions as f
 import globals as g
 
 
-@g.my_app.callback("import-images-with-masks")
-@sly.timeit
-def import_images_with_masks(
-    api: sly.Api, task_id: int, context: dict, state: dict, app_logger
-) -> None:
+def import_images_with_masks(api: sly.Api, task_id: int) -> None:
     f.download_project(api, g.DOWNLOAD_DIR)
 
     possible_dirs = [d for d in sly.fs.dirs_with_marker(g.DOWNLOAD_DIR, g.COLOR_MAP_FILE_NAME)]
@@ -85,13 +81,25 @@ def import_images_with_masks(
 
 def main():
     sly.logger.info(
-        "Script arguments", extra={"TEAM_ID": g.TEAM_ID, "WORKSPACE_ID": g.WORKSPACE_ID}
+        "Script arguments",
+        extra={
+            "TASK_ID": g.TASK_ID,
+            "TEAM_ID": g.TEAM_ID,
+            "WORKSPACE_ID": g.WORKSPACE_ID,
+        },
     )
-    g.my_app.run(initial_events=[{"command": "import-images-with-masks"}])
+    try:
+        import_images_with_masks(g.api, g.TASK_ID)
+    except Exception as e:
+        from supervisely.io.exception_handlers import handle_exception
+
+        exception_handler = handle_exception(e)
+        if exception_handler:
+            exception_handler.log_error_for_agent("import-images-with-masks")
+        else:
+            raise e
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    finally:
-        g.my_app.stop()
+    sly.main_wrapper("main", main)
+    g.my_app.stop()
