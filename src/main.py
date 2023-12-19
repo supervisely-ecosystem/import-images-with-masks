@@ -82,8 +82,6 @@ def import_images_with_masks(
     else:
         sly.logger.info(f"Succesfully uploaded images with masks.")
 
-    g.my_app.stop()
-
 
 def main():
     sly.logger.info(
@@ -93,4 +91,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    finally:
+        g.my_app.stop()
