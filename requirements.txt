@@ -1,2 +1,0 @@
-#supervisely==6.72.217
-git+https://github.com/supervisely/supervisely.git@add-progress-to-download_input

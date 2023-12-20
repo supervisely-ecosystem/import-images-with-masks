@@ -3,7 +3,7 @@
   "type": "app",
   "categories": ["import", "images"],
   "description": "Import images with binary masks as annotations",
-  "docker_image": "supervisely/import-export:6.72.217",
+  "docker_image": "supervisely/import-export:6.72.220",
   "main_script": "src/main.py",
   "modal_template": "src/modal.html",
   "modal_template_state": {
