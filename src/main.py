@@ -95,7 +95,7 @@ def main():
 
         exception_handler = handle_exception(e)
         if exception_handler:
-            exception_handler.log_error_for_agent("import-images-with-masks")
+            raise Exception(exception_handler.get_message_for_modal_window()) from e
         else:
             raise e
 
