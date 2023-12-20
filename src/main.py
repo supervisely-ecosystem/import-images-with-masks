@@ -1,63 +1,57 @@
 import os
 import supervisely as sly
 
-from supervisely import handle_exceptions
-
 import functions as f
 import globals as g
 
 
-@sly.timeit
-@handle_exceptions
-def import_images_with_masks(api: sly.Api, task_id: int):
-    if g.INPUT_PATH is None:
-        raise Exception("Please, upload a directory with images and masks. Read more in app overview.")
-    dir_info = api.file.list(g.TEAM_ID, g.INPUT_PATH)
-    if len(dir_info) == 0:
-        raise FileNotFoundError(f"There are no files in selected directory: '{g.INPUT_PATH}'")
+def import_images_with_masks(api: sly.Api, task_id: int) -> None:
+    f.download_project(api, g.DOWNLOAD_DIR)
 
-    if g.PROJECT_ID is None:
-        project_name = (
-            f.get_project_name_from_input_path(g.INPUT_PATH)
-            if len(g.OUTPUT_PROJECT_NAME) == 0
-            else g.OUTPUT_PROJECT_NAME
+    possible_dirs = [d for d in sly.fs.dirs_with_marker(g.DOWNLOAD_DIR, g.COLOR_MAP_FILE_NAME)]
+    if len(possible_dirs) == 0:
+        raise RuntimeError(
+            f"Can't find any directories with '{g.COLOR_MAP_FILE_NAME}' file in the '{g.DOWNLOAD_DIR}'"
         )
-    else:
-        project = api.project.get_info_by_id(g.PROJECT_ID)
-        project_name = project.name
-
-    download_path = f.download_project(api=api)
 
     uploaded = 0
-
-    for directory in sly.fs.dirs_with_marker(download_path, g.COLOR_MAP_FILE_NAME):
+    for project_path in possible_dirs:
         try:
-            sly.logger.debug(f"Processing directory: {directory}")
+            if g.PROJECT_ID is None:
+                project_name = (
+                    f.get_project_name_from_input_path(project_path)
+                    if len(g.OUTPUT_PROJECT_NAME) == 0
+                    else g.OUTPUT_PROJECT_NAME
+                )
+            else:
+                project = api.project.get_info_by_id(g.PROJECT_ID)
+                project_name = project.name
+            sly.logger.debug(f"Processing project_path: {project_path}")
 
-            class_color_map = f.get_class_color_map(project_path=directory)
+            class_color_map = f.get_class_color_map(project_path=project_path)
 
             sly.logger.debug("Class color map readed successfully...")
 
             project_meta = f.get_or_create_project_meta(
-                api=api, project_path=directory, classes_mapping=class_color_map
+                api=api, project_path=project_path, classes_mapping=class_color_map
             )
 
             sly.logger.debug("Project meta readed successfully...")
 
             converted_project_path = os.path.join(
-                os.path.dirname(os.path.dirname(directory)), "converted"
+                os.path.dirname(os.path.dirname(project_path)), "converted"
             )
 
             sly.logger.debug(f"Will try to convert project to: {converted_project_path}...")
 
             project = f.convert_project(
-                project_path=directory,
+                project_path=project_path,
                 new_project_path=converted_project_path,
                 project_meta=project_meta,
                 classes_map=class_color_map,
             )
 
-            sly.logger.info(f"Project from directory: {directory} converted successfully...")
+            sly.logger.info(f"Project from project_path: {project_path} converted successfully...")
 
             f.upload_project(
                 api=api,
@@ -69,35 +63,42 @@ def import_images_with_masks(api: sly.Api, task_id: int):
 
             uploaded += 1
 
-            sly.logger.info(f"Project from directory: {directory} uploaded successfully...")
+            sly.logger.info(
+                f"Project from directory: {converted_project_path} uploaded successfully..."
+            )
         except Exception as error:
             sly.logger.warning(
-                f"Project from directory: {directory} was not uploaded. Error: {error}"
+                f"Project from directory: {project_path} was not uploaded. Error: {error}"
             )
 
-    sly.logger.info("Finished processing all directories")
-
-    if not uploaded:
-        raise RuntimeError("The input data doesn't contain any valid directories.")
+    if uploaded == 0:
+        raise RuntimeError(
+            "Failed to upload data. Read the app overview and prepare data correctly."
+        )
     else:
-        sly.logger.info(f"Succesfully uploaded {uploaded} projects.")
+        sly.logger.info(f"Succesfully uploaded images with masks.")
 
 
 def main():
     sly.logger.info(
         "Script arguments",
         extra={
-            "context.teamId": g.TEAM_ID,
-            "context.workspaceId": g.WORKSPACE_ID,
-            "modal.state.slyFolder": g.INPUT_PATH,
+            "TASK_ID": g.TASK_ID,
+            "TEAM_ID": g.TEAM_ID,
+            "WORKSPACE_ID": g.WORKSPACE_ID,
         },
     )
-    import_images_with_masks(g.api, g.TASK_ID)
+    try:
+        import_images_with_masks(g.api, g.TASK_ID)
+    except Exception as e:
+        from supervisely.io.exception_handlers import handle_exception
+
+        exception_handler = handle_exception(e)
+        if exception_handler:
+            raise Exception(exception_handler.get_message_for_modal_window()) from e
+        else:
+            raise e
 
 
 if __name__ == "__main__":
     sly.main_wrapper("main", main)
-    try:
-        sly.app.fastapi.shutdown()
-    except KeyboardInterrupt:
-        sly.logger.info("Application shutdown successfully")

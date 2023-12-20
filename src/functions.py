@@ -1,6 +1,6 @@
 import os
 import re
-from os.path import basename, dirname, exists, isdir, isfile, join
+from os.path import basename, exists, isdir, isfile, join, normpath
 
 import cv2
 import magic
@@ -10,29 +10,31 @@ from supervisely.io.fs import get_file_name, get_file_name_with_ext
 from supervisely.io.json import load_json_file
 
 import globals as g
-import download_progress
 
 
 def get_project_name_from_input_path(input_path: str) -> str:
-    full_path_dir = dirname(input_path)
-    return basename(full_path_dir)
+    if isdir(input_path):
+        return basename(normpath(input_path))
+    raise ValueError(f"Input path: {input_path} is not a directory.")
 
 
-def download_project(api: sly.Api) -> tuple:
-    download_path = f"{g.STORAGE_DIR}/original_data/"
+def download_project(api: sly.Api, save_path) -> tuple:
+    api.file.download_input(save_path, log_progress=True)
+    list_dir = os.listdir(save_path)
 
-    sizeb = api.file.get_directory_size(g.TEAM_ID, g.INPUT_PATH)
-    progress_cb = download_progress.get_progress_cb(
-        api, g.TASK_ID, f"Downloading {g.INPUT_PATH.strip('/')}", sizeb, is_size=True
-    )
-    if not exists(download_path):
-        api.file.download_directory(
-            g.TEAM_ID,
-            remote_path=g.INPUT_PATH,
-            local_save_path=download_path,
-            progress_cb=progress_cb,
-        )
-    return download_path  # , converted_project_path
+    # check if save_path contains only archive or single directory with archive
+    if len(list_dir) == 1:
+        sub_dir = join(save_path, list_dir[0])
+        if sly.fs.is_archive(sub_dir):
+            sly.fs.unpack_archive(sub_dir, join(save_path, get_file_name(sub_dir)))
+            sly.fs.silent_remove(sub_dir)
+        else:
+            sub_dir_list = os.listdir(sub_dir)
+            if len(sub_dir_list) == 1:
+                sub_dir = join(sub_dir, sub_dir_list[0])
+                if sly.fs.is_archive(sub_dir):
+                    sly.fs.unpack_archive(sub_dir, join(save_path, get_file_name(sub_dir)))
+                    sly.fs.silent_remove(sub_dir)
 
 
 def get_datasets(project_path: str) -> tuple:
