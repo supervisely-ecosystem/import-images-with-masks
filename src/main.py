@@ -7,7 +7,7 @@ import globals as g
 
 @g.my_app.callback("import-images-with-masks")
 @sly.timeit
-def import_images_with_masks(api: sly.Api, task_id: int) -> None:
+def import_images_with_masks(api: sly.Api, task_id, context, state, app_logger) -> None:
     f.download_project(api, g.DOWNLOAD_DIR)
 
     possible_dirs = [d for d in sly.fs.dirs_with_marker(g.DOWNLOAD_DIR, g.COLOR_MAP_FILE_NAME)]
