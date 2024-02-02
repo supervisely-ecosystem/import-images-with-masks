@@ -28,7 +28,7 @@ def download_project(api: sly.Api, save_path) -> tuple:
         if sly.fs.is_archive(sub_dir):
             sly.fs.unpack_archive(sub_dir, join(save_path, get_file_name(sub_dir)))
             sly.fs.silent_remove(sub_dir)
-        else:
+        elif isdir(sub_dir):
             sub_dir_list = os.listdir(sub_dir)
             if len(sub_dir_list) == 1:
                 sub_dir = join(sub_dir, sub_dir_list[0])

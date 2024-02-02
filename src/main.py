@@ -5,13 +5,15 @@ import functions as f
 import globals as g
 
 
-def import_images_with_masks(api: sly.Api, task_id: int) -> None:
+@g.my_app.callback("import-images-with-masks")
+@sly.timeit
+def import_images_with_masks(api: sly.Api, task_id, context, state, app_logger) -> None:
     f.download_project(api, g.DOWNLOAD_DIR)
 
     possible_dirs = [d for d in sly.fs.dirs_with_marker(g.DOWNLOAD_DIR, g.COLOR_MAP_FILE_NAME)]
     if len(possible_dirs) == 0:
         raise RuntimeError(
-            f"Can't find any directories with '{g.COLOR_MAP_FILE_NAME}' file in the '{g.DOWNLOAD_DIR}'"
+            f"Can't find any directories with '{g.COLOR_MAP_FILE_NAME}' file in the input data"
         )
 
     uploaded = 0
@@ -77,7 +79,7 @@ def import_images_with_masks(api: sly.Api, task_id: int) -> None:
         )
     else:
         sly.logger.info(f"Succesfully uploaded images with masks.")
-
+    g.my_app.stop()
 
 def main():
     sly.logger.info(
@@ -88,17 +90,8 @@ def main():
             "WORKSPACE_ID": g.WORKSPACE_ID,
         },
     )
-    try:
-        import_images_with_masks(g.api, g.TASK_ID)
-    except Exception as e:
-        from supervisely.io.exception_handlers import handle_exception
-
-        exception_handler = handle_exception(e)
-        if exception_handler:
-            raise Exception(exception_handler.get_message_for_modal_window()) from e
-        else:
-            raise e
+    g.my_app.run(initial_events=[{"command": "import-images-with-masks"}])
 
 
 if __name__ == "__main__":
-    sly.main_wrapper("main", main)
+    sly.main_wrapper("main", main, log_for_agent=False)
