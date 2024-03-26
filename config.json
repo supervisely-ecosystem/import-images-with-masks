@@ -1,9 +1,12 @@
 {
   "name": "Import images with masks",
   "type": "app",
-  "categories": ["import", "images"],
+  "categories": [
+    "import",
+    "images"
+  ],
   "description": "Import images with binary masks as annotations",
-  "docker_image": "supervisely/import-export:6.73.22",
+  "docker_image": "supervisely/import-export:6.73.59",
   "main_script": "src/main.py",
   "modal_template": "src/modal.html",
   "modal_template_state": {
@@ -14,11 +17,16 @@
   "task_location": "workspace_tasks",
   "icon": "https://user-images.githubusercontent.com/48913536/182406824-47397e33-b596-49e7-b7c9-50a22c7e575f.png",
   "icon_cover": true,
-  "instance_version": "6.8.73",
+  "instance_version": "6.9.4",
   "headless": true,
   "context_menu": {
     "context_category": "Import",
-    "target": ["files_folder", "files_file", "images_project", "images_dataset"]
+    "target": [
+      "files_folder",
+      "files_file",
+      "images_project",
+      "images_dataset"
+    ]
   },
   "poster": "https://user-images.githubusercontent.com/48913536/182420556-a6d0abb6-0982-4206-af34-cf39fc0a6f2b.png"
 }
