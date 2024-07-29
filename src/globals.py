@@ -1,5 +1,6 @@
 import os
 from distutils.util import strtobool
+from workflow import Workflow
 
 import supervisely as sly
 from dotenv import load_dotenv
@@ -10,6 +11,7 @@ if sly.is_development():
 
 my_app = sly.AppService()
 api = sly.Api.from_env()
+workflow = Workflow(api)
 
 TASK_ID = sly.env.task_id()
 TEAM_ID = sly.env.team_id()
