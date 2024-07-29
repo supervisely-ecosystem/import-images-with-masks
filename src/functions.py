@@ -311,13 +311,14 @@ def upload_project(
         api.task.set_output_project(
             task_id=task_id, project_id=project_id, project_name=project_name
         )
+        workflow_project_id = project_id
     elif g.DATASET_ID is not None:
         datasets = local_project.datasets
-        dataset_name = g.api.dataset.get_info_by_id(g.DATASET_ID).name
+        dataset_info = g.api.dataset.get_info_by_id(g.DATASET_ID)
         for dataset in datasets:
             all_images_names = dataset.get_items_names()
             progress = sly.Progress(
-                message=f"Upload images to dataset: {dataset_name}",
+                message=f"Upload images to dataset: {dataset_info.name}",
                 total_cnt=len(all_images_names),
             )
             batch_upload(
@@ -329,7 +330,7 @@ def upload_project(
                 project_name=project_name,
                 progress=progress,
             )
-
+        workflow_project_id = dataset_info.project_id
     else:
         datasets = local_project.datasets
         for dataset in datasets:
@@ -350,7 +351,10 @@ def upload_project(
                 project_name=project_name,
                 progress=progress,
             )
-
+        workflow_project_id = g.PROJECT_ID
+    # -------------------------------------- Add Workflow Output ------------------------------------- #
+    g.workflow.add_output(workflow_project_id)
+    # ----------------------------------------------- - ---------------------------------------------- #
 
 def batch_upload(
     api: sly.Api,
