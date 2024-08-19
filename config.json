@@ -6,7 +6,7 @@
     "images"
   ],
   "description": "Import images with binary masks as annotations",
-  "docker_image": "supervisely/import-export:6.73.160",
+  "docker_image": "supervisely/import-export:6.73.162",
   "main_script": "src/main.py",
   "modal_template": "src/modal.html",
   "modal_template_state": {
