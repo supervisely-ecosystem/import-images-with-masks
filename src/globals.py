@@ -9,7 +9,6 @@ if sly.is_development():
     load_dotenv("local.env")
     load_dotenv(os.path.expanduser("~/supervisely.env"))
 
-my_app = sly.AppService()
 api = sly.Api.from_env()
 workflow = Workflow(api)
 

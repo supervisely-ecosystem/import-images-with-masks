@@ -4,10 +4,11 @@ import supervisely as sly
 import functions as f
 import globals as g
 
+from supervisely import handle_exceptions
 
-@g.my_app.callback("import-images-with-masks")
 @sly.timeit
-def import_images_with_masks(api: sly.Api, task_id, context, state, app_logger) -> None:
+@handle_exceptions(has_ui=False)
+def import_images_with_masks(api: sly.Api, task_id) -> None:
     f.download_project(api, g.DOWNLOAD_DIR)
 
     possible_dirs = [d for d in sly.fs.dirs_with_marker(g.DOWNLOAD_DIR, g.COLOR_MAP_FILE_NAME)]
@@ -79,7 +80,6 @@ def import_images_with_masks(api: sly.Api, task_id, context, state, app_logger) 
         )
     else:
         sly.logger.info(f"Succesfully uploaded images with masks.")
-    g.my_app.stop()
 
 def main():
     sly.logger.info(
@@ -90,8 +90,8 @@ def main():
             "WORKSPACE_ID": g.WORKSPACE_ID,
         },
     )
-    g.my_app.run(initial_events=[{"command": "import-images-with-masks"}])
+    import_images_with_masks(g.api, g.TASK_ID)
 
 
 if __name__ == "__main__":
-    sly.main_wrapper("main", main, log_for_agent=False)
+    sly.main_wrapper("main", main)
